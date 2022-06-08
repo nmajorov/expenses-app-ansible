@@ -1,0 +1,21 @@
+---
+- name: "install sso operator"
+  hosts: "localhost"
+  gather_facts: false
+  connection: local
+  become: false
+  vars:
+      # default will be $HOME/.kube/config
+      kubeconfig: "{{ lookup('env','KUBECONFIG') }}"
+      sso_operator_namespace: "nm-sso"
+     
+      #      htpasswd:
+      #        local: |
+      #          niko:$apr1$64z.beEg$qa6ua5luYoNMiY0iGR/Rq0
+      #        demo: |
+      #          user01:$apr1$VRlWl6KQ$wKj9FeNdCoZdeFATiMcMB0
+      #          user02:$apr1$ek4kUSDW$gt3G6PqP8ti5tlajM/3Mi.
+      #      ocp_admin_users:
+      #          - niko
+  roles:
+    - {role: sso-operator}

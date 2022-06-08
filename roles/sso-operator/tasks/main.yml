@@ -1,0 +1,23 @@
+---
+#  tasks for openshift4
+# ------------------------------------------------------------------------------
+# Configure sso
+# ------------------------------------------------------------------------------
+
+
+
+- debug:
+      msg: " Kube config path: {{ kubeconfig }}"
+
+- debug:
+      msg: " sso operator name space: {{ sso_operator_namespace }}"
+
+- fail: msg="The variable 'kubeconfig' is not defined"
+  when: kubeconfig is undefined
+
+
+
+- import_tasks: sso-operator.yaml
+  tags:
+    - sso
+

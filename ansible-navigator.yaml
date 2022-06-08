@@ -1,0 +1,4 @@
+---
+ansible-navigator:
+  execution-environment:
+    image: docker.io/nmajorov/nm-ansible-runner:1.0

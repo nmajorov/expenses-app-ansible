@@ -1,0 +1,245 @@
+# install and configure ibm-block-csi operator
+---
+- name: Create Namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: "{{ sso_operator_namespace }}"
+  tags:
+    - sso
+
+
+- name: "install sso operator group"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    template:
+      crds/sso-operatorgroup.yaml.j2
+  tags:
+    - sso
+
+- name: "install subscription for operator"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    template:
+      crds/sso-subscription.yaml.j2
+  register: operators
+  tags:
+    - sso
+
+
+- name: Pause for 1 minutes to be sure pods are comming up fine
+  pause:
+    minutes: 1
+
+- name: Wait for CSI drivers to start
+  shell: kubectl get pod -l name=rhsso-operator  -n "{{ sso_operator_namespace }}" | grep -v "operator" |  awk '{print $3}' | grep 'Pending|CrashLoopBackOff|ImagePullBackOff|ContainerCreating' | wc -l
+  register: podsrunning
+  until: " '0' in podsrunning.stdout"
+  retries: 120
+  delay: 2
+  changed_when: false
+  tags:
+    - sso
+
+
+
+- name: Print operator pod status
+  ansible.builtin.debug:
+    msg: "pods running: {{ podsrunning }}"
+
+
+#- name: "create compressed storage class"
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    definition:
+#      apiVersion: storage.k8s.io/v1
+#      kind: StorageClass
+#      metadata:
+#        name: svc-fs840-comp
+#      provisioner: block.csi.ibm.com
+#      parameters:
+#        SpaceEfficiency: compressed
+#        pool: fs840-csi
+#        csi.storage.k8s.io/provisioner-secret-name: svc-dh8
+#        csi.storage.k8s.io/provisioner-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/controller-publish-secret-name: svc-dh8
+#        csi.storage.k8s.io/controller-publish-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/controller-expand-secret-name: svc-dh8
+#        csi.storage.k8s.io/controller-expand-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/fstype: xfs
+#        volume_name_prefix: rhlab-comp
+#      allowVolumeExpansion: true
+#  tags:
+#    - storage
+#    - ibm
+#
+#
+#- name: "create a thin storage class"
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    definition:
+#      apiVersion: storage.k8s.io/v1
+#      kind: StorageClass
+#      metadata:
+#        name: svc-fs840-thin
+#        annotations:
+#          storageclass.kubernetes.io/is-default-class: "true"
+#      provisioner: block.csi.ibm.com
+#      parameters:
+#        SpaceEfficiency: thin
+#        pool: fs840-csi
+#        csi.storage.k8s.io/provisioner-secret-name: svc-dh8
+#        csi.storage.k8s.io/provisioner-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/controller-publish-secret-name: svc-dh8
+#        csi.storage.k8s.io/controller-publish-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/controller-expand-secret-name: svc-dh8
+#        csi.storage.k8s.io/controller-expand-secret-namespace: "{{ sso_operator_namespace }}"
+#        csi.storage.k8s.io/fstype: xfs
+#        volume_name_prefix: rhlab-thin
+#      allowVolumeExpansion: true
+#  tags:
+#    - storage
+#    - ibm
+#
+#
+#
+#- name: "create a test claim to be sure all works file"
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    namespace: "{{ sso_operator_namespace }}"
+#    definition:
+#      kind: PersistentVolumeClaim
+#      apiVersion: v1
+#      metadata:
+#        name: test-pvc
+#        namespace: techdata-storage
+#      spec:
+#        accessModes:
+#          - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 1Gi
+#        storageClassName: svc-fs840-thin
+#        volumeMode: Filesystem
+#  tags:
+#    - storage
+#    - ibm
+#
+#- name: Wait for test pvc to be  bound
+#  shell: oc get pvc test-pvc  -n "{{ sso_operator_namespace }}"  -o=jsonpath='{.status.phase}' | grep "Bound" | wc -l
+#  register: test_pvc_bound
+#  until: " '1' in test_pvc_bound.stdout"
+#  retries: 120
+#  delay: 2
+#  changed_when: false
+#  tags:
+#    - storage
+#    - ibm
+#
+#
+#- name: "all good delte test-pvc"
+#  kubernetes.core.k8s:
+#    state: absent
+#    kubeconfig: "{{ kubeconfig }}"
+#    namespace: "{{ sso_operator_namespace }}"
+#    definition:
+#      kind: PersistentVolumeClaim
+#      apiVersion: v1
+#      metadata:
+#        name: test-pvc
+#        namespace: techdata-storage
+#      spec:
+#        accessModes:
+#          - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 1Gi
+#        storageClassName: svc-fs840-thin
+#        volumeMode: Filesystem
+#    wait: true
+#    wait_timeout: 180
+#  tags:
+#    - storage
+#    - ibm
+#
+#
+#- name: "create a registry storage pvc"
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    namespace: "openshift-image-registry"
+#    definition:
+#      kind: PersistentVolumeClaim
+#      apiVersion: v1
+#      metadata:
+#        name: registry-storage
+#      spec:
+#        accessModes:
+#          - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 200Gi
+#        storageClassName: svc-fs840-thin
+#        volumeMode: Filesystem
+#    wait: true
+#    wait_timeout: 180
+#  tags:
+#    - storage
+#    - ibm
+#
+#- name: patch registry to rolloutStrategy recreate
+#  shell: oc patch config.imageregistry.operator.openshift.io/cluster --type=merge -p '{"spec":{"rolloutStrategy":"Recreate","replicas":1}}'
+#  changed_when: false
+#  tags:
+#    - storage
+#    - ibm
+#
+#- name: Add pvc registry-storage to image registry and expose it
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    merge_type: merge
+#    definition:
+#      kind: Config
+#      apiVersion: imageregistry.operator.openshift.io/v1
+#      metadata:
+#        name: cluster
+#      spec:
+#        managementState: Managed
+#        storage:
+#          pvc:
+#            claim: registry-storage
+#        defaultRoute: true
+## Needs retry because Operator needs time to create that object
+#  failed_when: false
+#  register: patch_status
+#  retries: 18
+#  delay: 10
+#  until: patch_status.msg is not defined
+#  tags:
+#    - storage
+#    - ibm
+#
+#- name: "Add MachineConfig to the cluster to enable multipath"
+#  kubernetes.core.k8s:
+#    state: present
+#    kubeconfig: "{{ kubeconfig }}"
+#    namespace: "{{ sso_operator_namespace }}"
+#    src: 99-ibm-attach.yaml
+#  tags:
+#    - storage
+#    - ibm
+#
+#    # todo check the state
+#    # oc get configs.imageregistry.operator.openshift.io cluster -o yaml | grep -i state
