@@ -6,16 +6,42 @@
 
 
 
+- name: "Set KUBECONFIG contents if not defined"
+  set_fact:
+    kubeconfig: "{{ lookup('env','HOME') + '/.kube/config' }}"
+  when: kubeconfig == "" or kubconfig is undefined
+  tags:
+    - tekton
+
+
 - debug:
-      msg: " Kube config path: {{ kubeconfig }}"
+      var=kubeconfig
+  tags:
+    - tekton
+
+
+
+- name: Gather installed openshift_cli  version, if there is any
+  ansible.builtin.shell:
+    cmd: |
+      {{openshift_cli }} version | head -1
+  register: ocresult
+  check_mode: false
+  changed_when: false
+  failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
+  tags:
+    - tekton
+
 
 - debug:
-      msg: " sso operator name space: {{ sso_operator_namespace }}"
+      msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+  tags:
+    - tekton
 
-- fail: msg="The variable 'kubeconfig' is not defined"
-  when: kubeconfig is undefined
 
 
+
+- debug:
 
 - import_tasks: sso-operator.yaml
   tags:

@@ -22,5 +22,6 @@
       #      ocp_admin_users:
       #          - niko
   roles:
-    - {role: sso-operator}
     - {role: openshift-pipeline-operator }
+    - {role: sso-operator}
+  

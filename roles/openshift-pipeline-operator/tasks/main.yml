@@ -27,11 +27,11 @@
 - name: Gather installed openshift_cli  version, if there is any
   ansible.builtin.shell:
     cmd: |
-      {{openshift_cli }} version 2>&1 | head -1 | cut -d '"' -f 2
+      {{openshift_cli }} version  | head -1
   register: ocresult
   check_mode: false
   changed_when: false
-  failed_when: ocresult.rc != 0
+  failed_when: ocresult.rc != 0 or ocresult.stderr != ""
   tags:
     - tekton
 
