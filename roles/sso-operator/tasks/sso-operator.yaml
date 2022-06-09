@@ -36,11 +36,16 @@
 
 
 - name: Pause for 1 minutes to be sure pods are comming up fine
-  pause:
+  ansible.builtin.pause:
     minutes: 1
 
-- name: Wait for CSI drivers to start
-  shell: kubectl get pod -l name=rhsso-operator  -n "{{ sso_operator_namespace }}" | grep -v "operator" |  awk '{print $3}' | grep 'Pending|CrashLoopBackOff|ImagePullBackOff|ContainerCreating' | wc -l
+
+- name: "Wait for operator to start"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pod -l name=rhsso-operator  -n {{ sso_operator_namespace }} \
+    | grep -v "operator" |  awk '{print $3}' \ 
+    | grep 'Pending|CrashLoopBackOff|ImagePullBackOff|ContainerCreating' | wc -l
+    exit 0
   register: podsrunning
   until: " '0' in podsrunning.stdout"
   retries: 120

@@ -1,0 +1,57 @@
+---
+#  tasks for openshift4
+
+- debug: 
+    msg: "Configure OpenShift pipeline operator"
+  tags:
+    - tekton
+
+
+
+
+- name: "Set KUBECONFIG contents if not defined"
+  set_fact:
+    kubeconfig: "{{ lookup('env','HOME') + '/.kube/config' }}"
+  when: kubeconfig == "" or kubconfig is undefined
+  tags:
+    - tekton
+
+
+- debug:
+      var=kubeconfig
+  tags:
+    - tekton
+
+
+
+- name: Gather installed openshift_cli  version, if there is any
+  ansible.builtin.shell:
+    cmd: |
+      {{openshift_cli }} version 2>&1 | head -1 | cut -d '"' -f 2
+  register: ocresult
+  check_mode: false
+  changed_when: false
+  failed_when: ocresult.rc != 0
+  tags:
+    - tekton
+
+
+
+- debug:
+      msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+  tags:
+    - tekton
+
+
+
+
+- debug:
+      msg: " pipeline operator install in namespace: {{ pipeline_operator_namespace }}"
+  tags:
+    - tekton
+  
+
+- import_tasks: operator-install.yaml
+  tags:
+    - tekton
+

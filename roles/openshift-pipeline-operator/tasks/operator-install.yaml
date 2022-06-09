@@ -1,0 +1,44 @@
+# install and configure openshift-pipeline operator
+---
+
+# - name: "install  operator group"
+#   kubernetes.core.k8s:
+#     state: present
+#     kubeconfig: "{{ kubeconfig }}"
+#     namespace: "{{ pipeline_operator_namespace }}"
+#     template:
+#       operator-group.yaml.j2
+#   tags:
+#     - tekton
+
+- name: "install subscription for operator"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ pipeline_operator_namespace }}"
+    template:
+      subscriptions-pipeline-operatpr.yaml.j2
+  register: operators
+  tags:
+    - tekton
+
+
+- name: Pause to be sure pods are coming up
+  ansible.builtin.pause:
+    minutes: 1
+  tags:
+    - tekton
+
+- name: "Wait for operator to start"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pods -l name=openshift-pipelines-operator  -n {{ pipeline_operator_namespace }} \
+    |  awk '{print $3}' \ 
+    | grep 'Pending|CrashLoopBackOff|ImagePullBackOff|ContainerCreating' | wc -l
+    exit 0
+  register: podsrunning
+  until: " '0' in podsrunning.stdout"
+  retries: 120
+  delay: 2
+  changed_when: false
+  tags:
+    - tekton

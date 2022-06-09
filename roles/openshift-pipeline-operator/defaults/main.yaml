@@ -1,0 +1,7 @@
+---
+
+openshift_cli: oc
+
+# by default install operator for all cluster
+pipeline_operator_namespace: "openshift-operators"
+
