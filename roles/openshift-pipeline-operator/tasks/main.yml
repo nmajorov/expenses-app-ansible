@@ -49,9 +49,20 @@
       msg: " pipeline operator install in namespace: {{ pipeline_operator_namespace }}"
   tags:
     - tekton
-  
+
+
+- name: "check if operator already installed"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pods -l name=openshift-pipelines-operator  -n {{ pipeline_operator_namespace }} --ignore-not-found \
+    | wc -l
+    exit 0
+  register: pipelinepodsrunning
+  tags:
+    - tekton
+
 
 - import_tasks: operator-install.yaml
+  when: "'0' in pipelinepodsrunning.stdout"
   tags:
     - tekton
 
