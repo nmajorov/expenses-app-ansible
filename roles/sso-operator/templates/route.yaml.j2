@@ -1,0 +1,89 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app: keycloak
+  name: "keycloak-https"
+spec:
+  host: keycloak-nm-sso.apps.ocp001.rhlab.ch
+  port:
+    targetPort: keycloak
+  tls:
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIDYzCCAkugAwIBAgIIDUn1R++HLaUwDQYJKoZIhvcNAQELBQAwJjEkMCIGA1UE
+      AwwbaW5ncmVzcy1vcGVyYXRvckAxNjQ2MjMzNTYxMB4XDTIyMDMwMjE1MTAxMFoX
+      DTI0MDMwMTE1MTAxMVowITEfMB0GA1UEAwwWKi5hcHBzLm9jcDAwMS5yaGxhYi5j
+      aDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOZ6om2pxjnuW5QJ+uny
+      Hw5QuVn9lO6rCdyls8IJ4eDsYUVKxoUaXFPtFUe5yfYghg0JHUGbZOM6NXu7yIf1
+      XjWi82xQxQ3wsz6jKreD1b6xlt6lNuaBKNfS1LmV9+hfsdRi0J8Wbwzo2DALXtqM
+      HLqgF+uXj67ChJ0pCLOem8Htvcb4mHHXgG3E3XQyi1ipN+TNmel2jzB9Z8Q9QnTF
+      JTFXOsKveFD51CrEVOyQHecQKA6wCWGBNTih8bv+uoolDcxwYdgRWVo7v9525vQR
+      MhXwodt+s9OZJQXIGKJMgXEbTXWs7+polYZKPjEopvzrNXZhG2gUWE9RQ2j76y9k
+      Vs0CAwEAAaOBmTCBljAOBgNVHQ8BAf8EBAMCBaAwEwYDVR0lBAwwCgYIKwYBBQUH
+      AwEwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQUD8isPzVeBCal4t+o4Hp/lCtV3K8w
+      HwYDVR0jBBgwFoAUuYfuyqg3pyAEUUkZLZRCrFxTphswIQYDVR0RBBowGIIWKi5h
+      cHBzLm9jcDAwMS5yaGxhYi5jaDANBgkqhkiG9w0BAQsFAAOCAQEAsylFMPLor4zy
+      m2aXy74uUxDBRZZbAWOBjqQG9nybCjE+gYoPP9FpqD6x629iU3G6VlXQ5NGzCKfF
+      yZrQ58hxvGlfC+hVs6MkXcUd/z2weqQ2e16yBkwnFMVuX3Z7ZHWzPGTy65xI9X6Q
+      2yMKUNK4H9mHjLhP7urEsWc2wiK843GhX3pDBNzvGdZWtEHcdAAKoxeAaYspZRDV
+      OiHKspbMgTWe7VekmTwARHbsHW1fnXjc9L+jUZIYa4oKWRPnkf2VWdonuYDqcFQw
+      vW5mwH1QMF8NsHXeUg+NNuYS1nnhEnWs3N/ad6sU4QSXyAyMOYeBkWDyFSq6BrNF
+      uzCTNp2LIQ==
+      -----END CERTIFICATE-----
+      -----BEGIN CERTIFICATE-----
+      MIIDDDCCAfSgAwIBAgIBATANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBtpbmdy
+      ZXNzLW9wZXJhdG9yQDE2NDYyMzM1NjEwHhcNMjIwMzAyMTUwNjAxWhcNMjQwMzAx
+      MTUwNjAyWjAmMSQwIgYDVQQDDBtpbmdyZXNzLW9wZXJhdG9yQDE2NDYyMzM1NjEw
+      ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7503g0nXnaodA6fSy3AsU
+      Z5Z0Hq5kAIPDxYFq7LfpSZnABI+EoOfH+UdG6xgFEb7v3oR1oD9P/dSg8f6ckg+I
+      vr3kVO6nx9OmcSQMJ+JMStlad4F3OTDBGm8VGq5zhqE/wPZ6H+GOp7Emn1rUk6Wf
+      0JDd21jrwYD3vdKcHppdrl2wMjfPq8z0k/bVKOhdp5+FZqFrrFlAxzZQp9HoUP35
+      zkDVu6xBWwHdJTYoy9P0txXPj4z7uDueA9wycySk5MXmVONqCcg7BNp41K1XnH/q
+      nmQ2DaZGsr74z3cbXJnfQk3m8MmM/PDs/yPoHC/cxiPg37gmc0EpRs2Ar75F6orx
+      AgMBAAGjRTBDMA4GA1UdDwEB/wQEAwICpDASBgNVHRMBAf8ECDAGAQH/AgEAMB0G
+      A1UdDgQWBBS5h+7KqDenIARRSRktlEKsXFOmGzANBgkqhkiG9w0BAQsFAAOCAQEA
+      nymmZKwdrMXTvyXW9HWc/v9HMUbkfIt5stESPXfHzdA0Jup9iStILLydOvRvmSD5
+      Z9kAVxoWceT32f0m0PWtNeruMPmK4dpcSALPBnDUGtx91G7Haa8p4fE7M3xvjdsA
+      BVbQ40YtUttMisYXPMaaWRLbXAkRfJTYZgwnilw2lY73uxPAu4ZJpK5nPIkJMS1h
+      YcnhBPhdJ5v5INOLRxEapX5ZFXrKBSGfTZRhnZoOs5Hg7C/FactdusoLX88Vi9iE
+      dMi3yvN6uEL0bmw1oeIIlK25B0UZxeSTHLZgiVn1ewpSRGUcpJ9TxjD9g3APurVI
+      +Rg1oFViQyEYvDkR/T+dFg==
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEpAIBAAKCAQEA5nqibanGOe5blAn66fIfDlC5Wf2U7qsJ3KWzwgnh4OxhRUrG
+      hRpcU+0VR7nJ9iCGDQkdQZtk4zo1e7vIh/VeNaLzbFDFDfCzPqMqt4PVvrGW3qU2
+      5oEo19LUuZX36F+x1GLQnxZvDOjYMAte2owcuqAX65ePrsKEnSkIs56bwe29xviY
+      cdeAbcTddDKLWKk35M2Z6XaPMH1nxD1CdMUlMVc6wq94UPnUKsRU7JAd5xAoDrAJ
+      YYE1OKHxu/66iiUNzHBh2BFZWju/3nbm9BEyFfCh236z05klBcgYokyBcRtNdazv
+      6miVhko+MSim/Os1dmEbaBRYT1FDaPvrL2RWzQIDAQABAoIBAB+OWODk5tQVs4ow
+      V59iXCgsm0Qb+SE4X9BLC7KcgcW295ZyJ34f3tZK1qgMYv+E8nWkctIBwa1u0dXQ
+      HyOmT7DOT7/byy8ebpw74ORhc4l5bSusuTiUJJBwOFn0k43IVGO8581wV+IPm1Hw
+      rJsFpgVTWBMUnEKUNW4DKULWi4LglJ+/KJf1b7/Ee6o6fhrKmNWphDraneqVBuyq
+      vjmYdumRIpxzcZh0CaM09rZnSfmB6dNeEfruLUOWxmCCewGGNO6eWqDjNVVWESLw
+      WyiArbTqx6Wbk9ha5kngGLbPHgusXtNjtmT4414dEWDwaC94Gs/jOzPcc8iVBZrz
+      lH4UOI0CgYEA8QJiR5pSPSTn7hJWvaSG251z0jirmO8NRcVg5imbNQJliR/WzShr
+      zcd6D5Xla71RMPjfeaiDgHRuCbP9LCU07oUw4C0KnCmlOZBU5KhRYFbCvFhs6jPQ
+      3hv2flsMmH/sc2G3B3fiF2X5Dpk0S9h/CLA6zkP0fZR5VjVkwO4PhGcCgYEA9NCT
+      c/zO9tjKWYWwFgTpSFQt4BoLY6mhnjINmz/ujX9BOwUhedU6oQrNI/KrQXmpal34
+      WdRRfkfeJWQpgxikgSt67XKZPATPvg1/jmHkrJVtC8J8P67wZoClZI8X1FIlDUSI
+      KLwKCPQN+8+1VGJaXTfefRjzVEROhURySqWCKqsCgYAysoet/D50ckD/iYgJmIRt
+      yi9E93rRTugB10VM5U+q1Pg64iGzQl97CA0bHjMGeOqNXKzV0Kbo7JUBIYWONb1u
+      t0HSxmbG9tO0yjGxb96+X0HTkN5IXeH/9u3hIpIBulco5lM0FPnQZjj/4yZnFgGS
+      +E9GeHEDwanMgqrREsLc3QKBgQDPwDyRXkVH5zr4c2G1nd9V2NHBbnihz67uL22q
+      hLts6kOx0S3SVOfXB/KEAgfgnVzufeYmXO33KwfSVUiBDqVzVDGSVQDClRayIoRP
+      kLVc28VZCGcmJ8+sPJmeV2wSas80jia54rDlXi6LtX0cqgYjOykcodLEfN7hau9O
+      d1uZ1wKBgQDEn1w3/iV/Nnp3UR4+Le7Dddn2KQqd9pKg+5RWqJhHyn4mGcnpSHfG
+      tImdyfBpDLdX1tLJ460Wc89aK4SaO841L9d2r4mQyCBaFiPz/rrZAYwCUrAhX7Xo
+      JxluKq2K58h/OEmyKpgkXproOqkKsLl0U7YYnoBNn80n9zypfaXkJA==
+      -----END RSA PRIVATE KEY-----
+    termination: reencrypt
+  to:
+    kind: Service
+    name: keycloak
+    weight: 100
+  wildcardPolicy: None

@@ -1,3 +1,4 @@
 #ignore navigator output files
+site*.json
 sso*.json
 ansible-navigator.log

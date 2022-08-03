@@ -1,4 +1,4 @@
-# OpenShift 4 role for sso operator
+# OpenShift 4 role used to deploy sso operator
 
 
 
