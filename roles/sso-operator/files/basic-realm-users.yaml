@@ -1,0 +1,68 @@
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakUser
+metadata:
+  name: user-joe
+spec:
+  user:
+    username: "joe"
+    firstName: "Joe"
+    lastName: "Biden"
+    email: "joe@example.com"
+    enabled: true
+    emailVerified: false
+    credentials:
+      - type: "password"
+        value: "openshift"
+    realmRoles:
+      - "default-roles-basic"
+    clientRoles:
+      account:
+        - "manage-account"
+      realm-management:
+        - "manage-users"
+  realmSelector:
+    matchLabels:
+      realm: basic
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakUser
+metadata:
+  name: user-alice
+spec:
+  user:
+    username: "alice"
+    firstName: "Alice"
+    lastName: "Liddell"
+    email: "alice@example.com"
+    enabled: true
+    emailVerified: false
+    credentials:
+      - type: "password"
+        value: "openshift"
+    realmRoles:
+      - "default-roles-basic"
+  realmSelector:
+    matchLabels:
+      realm: basic
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakUser
+metadata:
+  name: user-niko
+spec:
+  user:
+    username: "niko"
+    firstName: "Nikolaj"
+    lastName: "Majorov"
+    email: "niko@example.com"
+    enabled: true
+    emailVerified: false
+    credentials:
+      - type: "password"
+        value: "openshift"
+    realmRoles:
+      - "default-roles-basic"
+  realmSelector:
+    matchLabels:
+      realm: basic
