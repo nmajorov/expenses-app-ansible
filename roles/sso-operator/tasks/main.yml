@@ -10,14 +10,10 @@
   set_fact:
     kubeconfig: "{{ lookup('env','HOME') + '/.kube/config' }}"
   when: kubeconfig == "" or kubconfig is undefined
-  tags:
-    - tekton
 
 
 - debug:
       var=kubeconfig
-  tags:
-    - tekton
 
 
 
@@ -29,21 +25,12 @@
   check_mode: false
   changed_when: false
   failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
-  tags:
-    - tekton
 
 
 - debug:
       msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
-  tags:
-    - tekton
 
-
-
-
-- debug:
 
 - import_tasks: sso-operator.yaml
   tags:
     - sso
-

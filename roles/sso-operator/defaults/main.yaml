@@ -2,10 +2,7 @@
 
 openshift_cli: oc
 
-ocp_admin_users:
-  - niko
 
-# namespace there to install 
-# storage operators
-kube_storage_namespace: "techdata-storage"
-ibm_storage_address: "192.168.201.100"
+postgresql_database: "root"
+postgresql_user: "keycloak"
+postgresql_password: "keycloak"
