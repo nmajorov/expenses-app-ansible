@@ -127,3 +127,27 @@
       route.yaml.j2
   tags:
     - sso
+
+- name: "create basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      basic-realm.yaml
+  tags:
+    - sso
+
+
+- name: "create users for basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      basic-realm-users.yaml
+  tags:
+    - sso
+
+
+

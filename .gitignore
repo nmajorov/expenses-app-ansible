@@ -2,3 +2,4 @@
 site*.json
 sso*.json
 ansible-navigator.log
+*.swp
