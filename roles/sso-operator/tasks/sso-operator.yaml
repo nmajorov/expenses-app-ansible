@@ -1,5 +1,9 @@
-# install and configure ibm-block-csi operator
+# install and configure sso 7.x operator
+# with basic realm for the expense-app demo
+#
 ---
+
+
 - name: Create Namespace for sso
   kubernetes.core.k8s:
     state: present
@@ -150,4 +154,12 @@
     - sso
 
 
-
+- name: "create backend client for basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      sso-clients.yaml
+  tags:
+    - sso

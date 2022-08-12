@@ -1,0 +1,18 @@
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: backend-client
+  labels:
+    app: keycloak
+spec:
+  client:
+    # auto-generated if not supplied
+    # id: 123
+    clientId: backend
+    secret: 16c3384b-725d-410d-8107-df3319165f70
+    clientAuthenticatorType: client-secret
+    protocol: openid-connect
+  realmSelector:
+    matchLabels:
+      realm: basic
