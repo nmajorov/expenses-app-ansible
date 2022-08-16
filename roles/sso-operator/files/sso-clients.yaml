@@ -16,3 +16,19 @@ spec:
   realmSelector:
     matchLabels:
       realm: basic
+
+---
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: curl
+  labels:
+    app: keycloak
+spec:
+  client:
+    clientId: curl
+    protocol: openid-connect
+  realmSelector:
+    matchLabels:
+      realm: basic
+

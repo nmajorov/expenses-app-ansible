@@ -24,4 +24,4 @@
   roles:
     - {role: openshift-pipeline-operator }
     - {role: sso-operator}
-  
+    #- {role: expenses-app-pipelines }

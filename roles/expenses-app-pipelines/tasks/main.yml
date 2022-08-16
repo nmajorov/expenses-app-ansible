@@ -1,0 +1,49 @@
+---
+#  tasks for openshift4
+# ------------------------------------------------------------------------------
+# Configure backend
+# ------------------------------------------------------------------------------
+
+
+
+- name: "Set KUBECONFIG contents if not defined"
+  set_fact:
+    kubeconfig: "{{ lookup('env','HOME') + '/.kube/config' }}"
+  when: kubeconfig == "" or kubconfig is undefined
+
+
+- debug:
+      var=kubeconfig
+
+
+
+- name: Gather installed openshift_cli  version, if there is any
+  ansible.builtin.shell:
+    cmd: |
+      {{openshift_cli }} version | head -1
+  register: ocresult
+  check_mode: false
+  changed_when: false
+  failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
+
+
+- debug:
+      msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+
+
+- name: Create Namespace for sso
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: "{{ app_namespace }}"
+  tags:
+    - sso
+
+
+- import_tasks: sso-operator.yaml
+  tags:
+    - backend
