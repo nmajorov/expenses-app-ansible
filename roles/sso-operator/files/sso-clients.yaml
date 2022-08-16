@@ -28,7 +28,13 @@ spec:
   client:
     clientId: curl
     protocol: openid-connect
+    publicClient: true
+    redirectUris:
+      - "+"
+    webOrigins: 
+      - "*"
+    standardFlowEnabled: true
+    directAccessGrantsEnabled: true
   realmSelector:
     matchLabels:
       realm: basic
-
