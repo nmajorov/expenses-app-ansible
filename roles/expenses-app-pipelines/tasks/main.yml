@@ -30,9 +30,11 @@
 
 - debug:
       msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+  tags:
+    - app-deploy
+  
 
-
-- name: Create Namespace for sso
+- name: Create Namespace for application
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -49,4 +51,3 @@
   tags:
     - backend
     - app-deploy
-

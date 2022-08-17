@@ -1,11 +1,11 @@
 
 
 - name: "deploy backend pipeline"
-	ansible.builtin.debug:
-  	msg:
-    	- "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    	- "deploy backend pipeline in namespace '{{ app_namespace }}'"
-			- "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"   
+  ansible.builtin.debug:
+    msg:
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+      - "deploy backend pipeline in namespace '{{ app_namespace }}'"
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
 - name: "add admin to pipline service account"
   ansible.builtin.shell: |
@@ -14,15 +14,14 @@
       -n {{ app_namespace}}
     exit 0
   changed_when: false
- 
+
 
 - name: "deploy backend workspace pvc"
-   kubernetes.core.k8s:
+  kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
-    src:
-      backend/pvc-workspace.yaml
+    src: backend/resources/pvc-workspace.yaml
 
 - name: "deploy pipeline backend image resource"
   kubernetes.core.k8s:
@@ -52,5 +51,3 @@
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
     src:  backend/pipeline.yaml
-
-
