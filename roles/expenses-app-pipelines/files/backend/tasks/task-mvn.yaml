@@ -1,0 +1,88 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: backend-mvn
+spec:
+
+  inputs:
+    params:
+      - name: VERSION
+        type: string
+        description: The version of the build image
+        default: '21.2.0-java11'
+      - name: GOALS
+        description: The Maven goals to run
+        type: string
+        default: "test"
+     # database parameters
+      - name: postgesql-user
+        type: string
+        description: login for postgresql database
+        default: keycloak
+      - name: postgresql-password
+        type: string
+        description: password for postgresql database
+        default: keycloak
+      - name: postresql-database
+        type: string
+        default: root
+        description: default database
+      - name: database-service-name
+        type: string
+        default: sso-test-postgresql
+      - name: keycloak_url
+        type: string
+        #default: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"
+  steps:
+    - name: mvn
+      image:  "quay.io/quarkus/centos-quarkus-maven:$(inputs.params.VERSION)"
+      workingDir: /workspace/source
+      script: |
+        #!/usr/bin/env bash
+        [[ $PWD == /workspace/source ]]
+        echo "working dir now $PWD"
+        cd /workspace/source
+
+
+        echo "run with postgresql"
+        export POSTGRESQL_SERVICE_NAME="$(inputs.params.database-service-name)"
+
+        export POSTGRESQL_USER="$(inputs.params.postgesql-user)"
+        export POSTGRESQL_PASSWORD="$(inputs.params.postgresql-password)"
+        export POSTGRESQL_DATABASE="$(inputs.params.postresql-database)"
+
+        echo $(env | grep POSTGRESQL)
+
+
+        echo
+        echo
+
+        export KEYCLOAK_URL="$(inputs.params.keycloak_url)/auth/realms/basic"
+
+        export KEYCLOAK_INTROSPECT_URL="$KEYCLOAK_URL/protocol/openid-connect/token/introspect"
+        export KEYCLOAK_CLIENT_ID="backend"
+        export KEYCLOAK_SECRET="16c3384b-725d-410d-8107-df3319165f70"
+
+        echo $KEYCLOAK_URL
+        echo $KEYCLOAK_INTROSPECT_URL
+
+        echo
+        echo
+
+        curl -v -XGET $KEYCLOAK_URL
+        echo
+        echo
+
+        echo "prepare maven local repo to speed up tasks"
+        mkdir -vp $PWD/mvnrepo
+        echo "copy custom  settings.xml file to repo"
+        cp -v $PWD/settings.xml $PWD/mvnrepo
+
+        echo "run GOALS: $(inputs.params.GOALS)"
+
+        mvn  -Dmaven.repo.local="$PWD/mvnrepo"  $(inputs.params.GOALS)
+
+
+  workspaces:
+    - name: input
+      mountPath: /workspace/source

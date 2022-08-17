@@ -1,0 +1,21 @@
+---
+# test mvn test command
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+
+metadata:
+  generateName: s2i-quarkus-maven-taskrun
+
+spec:
+  resources:
+    outputs:
+      - name: image
+        resourceRef:
+          name: backend-image
+  taskRef:
+    name: s2i-quarkus-maven
+
+  workspaces:
+    - name: input
+      persistentVolumeClaim:
+        claimName: source-pvc

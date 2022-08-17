@@ -1,0 +1,21 @@
+---
+# test mvn test command
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+
+metadata:
+  generateName: mvn-test-taskrun
+
+spec:
+  taskRef:
+    name: backend-mvn
+  params:
+    - name: GOALS
+      value: "clean test"
+    - name: keycloak_url
+      value: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"
+      #value: "http://sso-test:8080"
+  workspaces:
+    - name: input
+      persistentVolumeClaim:
+        claimName: source-pvc

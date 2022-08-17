@@ -1,0 +1,49 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clean-up-backend
+
+spec:
+
+
+  params:
+    - name: keep-repo
+      type: string
+      description: "keep maven repo for next builds to speed up development"
+      default: "true"
+
+  steps:
+    - name: clean
+      image: quay.io/openshift/origin-cli:latest
+      workingDir: /workspace/output
+      script: |
+        #!/usr/bin/env bash
+        set -x
+
+        pwd
+
+        if [ "$(params.keep-repo)" == "true" ] ; then
+            echo "remove existing checkout sources but keep repo"
+
+            find .  -not -path "./mvnrepo*"  -exec rm -rf {}  \;
+
+        else
+             find . -exec rm -rf  {} 2>  \;
+        fi
+
+
+        ls -lisa
+
+
+        echo "delete openshift test resources"
+        oc delete all \
+          --selector=app.kubernetes.io/component=sso-test \
+          --ignore-not-found=true
+        oc delete secrets sso-app-secret --ignore-not-found=true
+
+
+
+  workspaces:
+    - name: output
+      mountPath: /workspace/output

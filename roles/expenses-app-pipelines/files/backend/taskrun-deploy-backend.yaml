@@ -1,0 +1,15 @@
+---
+# test mvn test command
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+
+metadata:
+  generateName: deploy-backend-taskrun
+
+spec:
+  taskRef:
+    name: deploy-native-backend
+  workspaces:
+    - name: input
+      persistentVolumeClaim:
+        claimName: source-pvc

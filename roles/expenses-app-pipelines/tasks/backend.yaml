@@ -1,0 +1,49 @@
+
+
+- name: "deploy backend pipeline"
+	ansible.builtin.debug:
+  	msg:
+    	- "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    	- "deploy backend pipeline in namespace '{{ app_namespace }}'"
+			- "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"   
+
+- name: "add admin to pipline service account"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} policy add-role-to-user \
+       admin system:serviceaccount:{{ app_namespace}}:pipeline \
+      -n {{ app_namespace}}
+    exit 0
+  changed_when: false
+ 
+
+- name: "deploy backend workspace pvc"
+   kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src:
+      backend/pvc-workspace.yaml
+
+- name: "deploy pipeline backend image resource"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template:
+      backend/image-resource.j2
+
+- name: "deploy tasks"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+      - backend/tasks/task-clean-up.yaml
+      - backend/tasks/task-deploy-native-backend.yaml
+      - backend/tasks/task-deploy-postgresql.yaml
+      - backend/tasks/task-mvn.yaml
+      - backend/tasks/task-push-image.yaml
+
+
+
