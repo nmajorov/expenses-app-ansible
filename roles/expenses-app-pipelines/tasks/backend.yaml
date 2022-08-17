@@ -46,4 +46,11 @@
       - backend/tasks/task-push-image.yaml
 
 
+- name: "deploy pipeline"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src:  backend/pipeline.yaml
+
 
