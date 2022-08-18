@@ -2,11 +2,13 @@
 
 openshift_cli: oc
 
+# we need this to get a host to sso
+sso_operator_namespace: nm-sso
 
 postgresql_database: "root"
 postgresql_user: "keycloak"
 postgresql_password: "keycloak"
 
 app_namespace: "nm-demo"
-app_backend_git_revision: "develop"
+app_backend_git_revision: "development"
 app_frontend_git_revision: "develop"

@@ -1,5 +1,4 @@
-
-
+---
 - name: "deploy backend pipeline"
   ansible.builtin.debug:
     msg:
@@ -33,10 +32,11 @@
 
 
 - name: "delete tasks if exists"
-  #to redeploy we need to delete tasks first
+  # to redeploy we need to delete tasks first
   ansible.builtin.shell: |
-    {{ openshift_cli }} delete  --ignore-not-found=true --all -n {{ app_namespace}}
-    exit 0
+    {{ openshift_cli }} delete tasks.tekton.dev \
+    --ignore-not-found=true --all -n {{ app_namespace}}
+     exit 0
   changed_when: false
 
 
@@ -47,11 +47,11 @@
     namespace: "{{ app_namespace }}"
     src: "{{ item }}"
   loop:
-      - backend/tasks/task-clean-up.yaml
-      - backend/tasks/task-deploy-native-backend.yaml
-      - backend/tasks/task-deploy-postgresql.yaml
-      - backend/tasks/task-mvn.yaml
-      - backend/tasks/task-push-image.yaml
+    - backend/tasks/task-clean-up.yaml
+    - backend/tasks/task-deploy-native-backend.yaml
+    - backend/tasks/task-deploy-postgresql.yaml
+    - backend/tasks/task-mvn.yaml
+    - backend/tasks/task-push-image.yaml
 
 
 - name: "deploy pipeline"
@@ -59,4 +59,32 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
-    src:  backend/pipeline.yaml
+    src:
+      backend/pipeline.yaml
+
+
+- name: "get full sso url from route"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get route -n {{ sso_operator_namespace }} \
+    keycloak-https -o jsonpath=\{.spec.host\}
+    exit 0
+  register: ssohost
+
+
+- name: "show variables"
+  ansible.builtin.debug:
+    msg:
+      - "run pipeline with params" 
+      - " branch: {{ app_backend_git_revision }} "
+      - " sso url: https://{{ ssohost.stdout }} "
+
+
+- name: "create a pipline run with parameters"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template:
+      backend/pipeline-run.yaml.j2
+
+

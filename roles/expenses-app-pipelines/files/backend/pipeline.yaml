@@ -51,9 +51,11 @@ spec:
     - name: test
       taskRef:
         name: backend-mvn
+      runAfter:
+        - fetch-repository
       params:
         - name: keycloak_url
-          value: "http://$(params.sso-service-name):8080"
+          value: "$(params.keycloak_url)"
       workspaces:
         - name: input
           workspace: shared-workspace

@@ -36,14 +36,6 @@ spec:
         ls -lisa
 
 
-        echo "delete openshift test resources"
-        oc delete all \
-          --selector=app.kubernetes.io/component=sso-test \
-          --ignore-not-found=true
-        oc delete secrets sso-app-secret --ignore-not-found=true
-
-
-
   workspaces:
     - name: output
       mountPath: /workspace/output
