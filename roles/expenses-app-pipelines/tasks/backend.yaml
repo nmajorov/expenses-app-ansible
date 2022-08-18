@@ -31,6 +31,15 @@
     template:
       backend/image-resource.j2
 
+
+- name: "delete tasks if exists"
+  #to redeploy we need to delete tasks first
+  ansible.builtin.shell: |
+    {{ openshift_cli }} delete  --ignore-not-found=true --all -n {{ app_namespace}}
+    exit 0
+  changed_when: false
+
+
 - name: "deploy tasks"
   kubernetes.core.k8s:
     state: present
