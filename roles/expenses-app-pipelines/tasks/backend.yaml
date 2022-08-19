@@ -22,7 +22,7 @@
     namespace: "{{ app_namespace }}"
     src: backend/resources/pvc-workspace.yaml
 
-- name: "deploy pipeline backend image resource"
+- name: "backend: deploy pipeline backend image resource"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -31,7 +31,17 @@
       backend/image-resource.j2
 
 
-- name: "delete tasks if exists"
+- name: "backend: deploy backend database"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template:
+      backend/postgres-deployment.yaml.j2
+
+
+
+- name: "backend: delete tasks if exists"
   # to redeploy we need to delete tasks first
   ansible.builtin.shell: |
     {{ openshift_cli }} delete tasks.tekton.dev \
@@ -40,7 +50,7 @@
   changed_when: false
 
 
-- name: "deploy tasks"
+- name: "backend: deploy tasks"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -54,7 +64,7 @@
     - backend/tasks/task-push-image.yaml
 
 
-- name: "deploy pipeline"
+- name: "backend: deploy pipeline"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -71,7 +81,7 @@
   register: ssohost
 
 
-- name: "show variables"
+- name: "show backend build variables"
   ansible.builtin.debug:
     msg:
       - "run pipeline with params" 
@@ -79,7 +89,7 @@
       - " sso url: https://{{ ssohost.stdout }} "
 
 
-- name: "create a pipline run with parameters"
+- name: "create a pipline run backend "
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"

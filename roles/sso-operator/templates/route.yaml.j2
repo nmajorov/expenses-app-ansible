@@ -8,7 +8,7 @@ metadata:
     app: keycloak
   name: "keycloak-https"
 spec:
-  host: keycloak-nm-sso.apps.ocp001.rhlab.ch
+  host: keycloak-nm-sso.{{wildcard_domain}}
   port:
     targetPort: keycloak
   tls:

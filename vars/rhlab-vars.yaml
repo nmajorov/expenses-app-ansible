@@ -1,0 +1,8 @@
+---
+# variables for the rhlab-server
+wildcard_domain: "apps.ocp001.rhlab.ch"
+sso_operator_namespace: "nm-sso"
+#namespace there demo should be deployed
+app_namespace: "nm-demo"
+
+

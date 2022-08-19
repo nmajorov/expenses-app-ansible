@@ -5,6 +5,8 @@ openshift_cli: oc
 # we need this to get a host to sso
 sso_operator_namespace: nm-sso
 
+# backend database deployment variables
+database_deployment_name: demodb
 postgresql_database: "root"
 postgresql_user: "keycloak"
 postgresql_password: "keycloak"

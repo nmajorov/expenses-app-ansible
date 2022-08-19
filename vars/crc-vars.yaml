@@ -1,0 +1,8 @@
+---
+# variables for the local crc server
+wildcard_domain: "apps-crc.testing"
+sso_operator_namespace: "nm-sso"
+#namespace there demo should be deployed
+app_namespace: "nm-demo"
+
+

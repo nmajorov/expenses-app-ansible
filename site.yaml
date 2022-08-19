@@ -7,21 +7,9 @@
   vars:
       # default will be $HOME/.kube/config
       kubeconfig: "{{ lookup('env','KUBECONFIG')}}"
-      sso_operator_namespace: "nm-sso"
-      #namespace there demo should be deployed
-      app_namespace: "nm-demo"
-      app_backend_git_revision: "develop"
-      app_frontend_git_revision: "develop"
-
-      #      htpasswd:
-      #        local: |
-      #          niko:$apr1$64z.beEg$qa6ua5luYoNMiY0iGR/Rq0
-      #        demo: |
-      #          user01:$apr1$VRlWl6KQ$wKj9FeNdCoZdeFATiMcMB0
-      #          user02:$apr1$ek4kUSDW$gt3G6PqP8ti5tlajM/3Mi.
-      #      ocp_admin_users:
-      #          - niko
+  vars_files:
+      - vars/vars.yaml
   roles:
-    - {role: openshift-pipeline-operator }
-    - {role: sso-operator}
-    #- {role: expenses-app-pipelines }
+      - {role: openshift-pipeline-operator}
+      - {role: sso-operator}
+      - {role: expenses-app-pipelines}

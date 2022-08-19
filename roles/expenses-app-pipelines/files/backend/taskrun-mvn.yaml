@@ -13,8 +13,7 @@ spec:
     - name: GOALS
       value: "clean test"
     - name: keycloak_url
-      value: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"
-      #value: "http://sso-test:8080"
+      value: "http://sso-test:8080"
   workspaces:
     - name: input
       persistentVolumeClaim:
