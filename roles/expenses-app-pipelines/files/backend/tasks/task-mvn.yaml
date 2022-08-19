@@ -29,7 +29,7 @@ spec:
         description: default database
       - name: database-service-name
         type: string
-        default: sso-test-postgresql
+        default: demo-db
       - name: keycloak_url
         type: string
         #default: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"

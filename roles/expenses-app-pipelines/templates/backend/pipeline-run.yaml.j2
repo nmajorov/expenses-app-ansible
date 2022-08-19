@@ -9,6 +9,16 @@ spec:
       value: "{{ app_backend_git_revision }}"
     - name: keycloak_url
       value: "https://{{ ssohost.stdout }}"
+     # backend database parameters
+    - name: postgesql-user
+      value: "{{ postgresql_user }}"
+    - name: postgresql-password
+      value: "{{ postgresql_password }}"
+    - name: postresql-database
+      value: "{{ postgresql_database }}"
+    - name: database-service-name
+      value: "{{ database_deployment_name }}"
+ 
   pipelineRef:
     name: build-and-deploy-backend
   workspaces:
