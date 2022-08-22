@@ -6,7 +6,7 @@ openshift_cli: oc
 sso_operator_namespace: nm-sso
 
 # backend database deployment variables
-database_deployment_name: demodb
+database_deployment_name: knm
 postgresql_database: "root"
 postgresql_user: "keycloak"
 postgresql_password: "keycloak"

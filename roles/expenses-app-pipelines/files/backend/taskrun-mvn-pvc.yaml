@@ -16,7 +16,13 @@ spec:
       value: "https://keycloak-nm-sso.apps-crc.testing"
   workspaces:
     - name: input
-      emptyDir: {}
-      
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+
       #persistentVolumeClaim:
       #  claimName: source-pvc

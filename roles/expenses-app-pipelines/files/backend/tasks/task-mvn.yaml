@@ -9,7 +9,7 @@ spec:
       - name: VERSION
         type: string
         description: The version of the build image
-        default: '21.2.0-java11'
+        default: '21.3'
       - name: GOALS
         description: The Maven goals to run
         type: string
@@ -35,13 +35,14 @@ spec:
         #default: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"
   steps:
     - name: mvn
-      image:  "quay.io/quarkus/centos-quarkus-maven:$(inputs.params.VERSION)"
+      image:  "quay.io/nmajorov/centos-quarkus-maven:$(inputs.params.VERSION)"
       workingDir: /workspace/source
       script: |
         #!/usr/bin/env bash
         [[ $PWD == /workspace/source ]]
         echo "working dir now $PWD"
-        cd /workspace/source
+        echo "list dir"
+        ls -lisa
 
 
         echo "run with postgresql"
@@ -69,7 +70,7 @@ spec:
         echo
         echo
 
-        curl -v -XGET $KEYCLOAK_URL
+        curl -v -k --request GET $KEYCLOAK_URL/.well-known/openid-configuration
         echo
         echo
 

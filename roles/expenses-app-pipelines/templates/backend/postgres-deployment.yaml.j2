@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-      
+
 ---
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
@@ -60,12 +60,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: "knm"
+  name: "{{ database_deployment_name }}"
   labels:
     app: {{database_deployment_name}}
 spec:
   ports:
-  - name: knm
+  - name: "{{ database_deployment_name }}"
     nodePort: 0
     port: 5432
     protocol: TCP
@@ -75,5 +75,3 @@ spec:
     deploymentconfig: {{database_deployment_name}}
   sessionAffinity: None
   type: ClusterIP
-
-
