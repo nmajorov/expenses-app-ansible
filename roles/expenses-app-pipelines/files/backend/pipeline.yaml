@@ -21,6 +21,9 @@ spec:
     - name: sso-service-name
       type: string
       default: "sso-test"
+    - name: database-service-name
+      type: string
+      default: "knm"
   resources:
     - name: backend-image
       type: image
@@ -56,6 +59,8 @@ spec:
       params:
         - name: keycloak_url
           value: "$(params.keycloak_url)"
+        - name: database-service-name
+          value:  "$(params.database-service-name)"
       workspaces:
         - name: input
           workspace: shared-workspace

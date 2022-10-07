@@ -33,7 +33,7 @@ spec:
         description: database kubernetes service name in same namespace
       - name: keycloak_url
         type: string
-        #default: "http://sso-test-nm-demo.apps.ocp-cluster-1.rhlab.ch"
+        
   steps:
     - name: mvn
       image:  "quay.io/nmajorov/centos-quarkus-maven:$(inputs.params.VERSION)"
