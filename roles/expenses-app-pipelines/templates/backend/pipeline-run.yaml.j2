@@ -18,7 +18,7 @@ spec:
       value: "{{ postgresql_database }}"
     - name: database-service-name
       value: "{{ database_deployment_name }}"
- 
+
   pipelineRef:
     name: build-and-deploy-backend
   workspaces:

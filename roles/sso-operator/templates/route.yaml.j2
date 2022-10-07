@@ -8,62 +8,63 @@ metadata:
     app: keycloak
   name: "keycloak-https"
 spec:
-  host: keycloak-nm-sso.{{wildcard_domain}}
+  host: keycloak-{{ sso_operator_namespace }}.{{wildcard_domain}}
   port:
     targetPort: keycloak
-  tls:
-    certificate: |
-      -----BEGIN CERTIFICATE-----
-      MIIC9zCCAd8CFANWVckeNtre8t51h2UuVKoitGinMA0GCSqGSIb3DQEBCwUAMDgx
-      ETAPBgNVBAMMCHJobGFiLmNoMQswCQYDVQQGEwJVUzEWMBQGA1UEBwwNU2FuIEZy
-      YW5zaXNjbzAeFw0yMjA4MjIxMDE2MjZaFw0yNDA4MjExMDE2MjZaMDgxETAPBgNV
-      BAMMCHJobGFiLmNoMQswCQYDVQQGEwJVUzEWMBQGA1UEBwwNU2FuIEZyYW5zaXNj
-      bzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKxMbYBWC1scplT+v3qE
-      /cHSOkMV+kVfPdZkWQrBnjNuyYYVSbJm6DDGi6TezM3jUWoRjj5g8sJAPiajPF2w
-      JWEe2LHVagq5nlLNnNTIVI2VT/NDSyNLBkm56CIq12K5d7nT7aUtyJ84e09Khot7
-      sSIS82/PYYkQO1n3r3lXQ0cKitV74ppmCYR3Hhy3AqmNukG1LhV4I++RvYAdsj07
-      faZkxsh/KzCFBFbkeHdtYWl4HIvR5BCsqVCuqLb97W4Eh0J84OgDMaRVPUxr2dci
-      skSRAxh2ppWiIR5StQJoWU65xAcW2siH5q712K9YgvXPH0ZLW1PlYlczFWkIBN0L
-      MWsCAwEAATANBgkqhkiG9w0BAQsFAAOCAQEAoYbo+WDuIlMP3dBzjdP2cwWo0L1S
-      b/8DIXhK9bkFctXsQrkE04RFL5mzG/UDilwBjY5CcbYMdkVDM46dvM4mU+0BuYXJ
-      Ex/zfke1Nx2Oygvz9fRXALRfyQ0Wtkee52Kw4CBIHOCkeuAXtIP4EW4ObI2AuhiX
-      fVgjk+88jneYC1ndeV4O1avh+Ny402CAS1EboDZwSmUDg7Hyv7mRiUs+UoK/3iq6
-      OpRrP72Jecf+Yj/uNPeFTdpWnomk3ufWQcDLBktPEy+73GdrQTVDZ+FJ8HzLqUpH
-      knP2H0zyZThlkQSZw8BTBzR0qmUrXLfsDP1OBWcDWWfmzimrdmHK0sAYlw==
-      -----END CERTIFICATE-----
-    key: |
-      -----BEGIN PRIVATE KEY-----
-      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCsTG2AVgtbHKZU
-      /r96hP3B0jpDFfpFXz3WZFkKwZ4zbsmGFUmyZugwxouk3szN41FqEY4+YPLCQD4m
-      ozxdsCVhHtix1WoKuZ5SzZzUyFSNlU/zQ0sjSwZJuegiKtdiuXe50+2lLcifOHtP
-      SoaLe7EiEvNvz2GJEDtZ9695V0NHCorVe+KaZgmEdx4ctwKpjbpBtS4VeCPvkb2A
-      HbI9O32mZMbIfyswhQRW5Hh3bWFpeByL0eQQrKlQrqi2/e1uBIdCfODoAzGkVT1M
-      a9nXIrJEkQMYdqaVoiEeUrUCaFlOucQHFtrIh+au9divWIL1zx9GS1tT5WJXMxVp
-      CATdCzFrAgMBAAECggEAL2Nh5p9Dxk5t7QiXz3HOfUV94r+jsvrL/jBhURUJlunM
-      oYUvXNLy359r/u+McsAnvz2O2tc9TXHv5h6VVstArKKYROkGnmaJBgspLFjg8IP1
-      llmWy+ExnIt2LheMX8nVBRYl0X1zJV+agqdjs+9UO6Pssn7eO51sRYVbDMuUZHAs
-      n1D5XrXmX6cZ1X/92ZbZ4gooq2UFStDfnRZSqCvaIBiheYSxB6Dfn0WyvgaKNoif
-      QNLCo5COhAjGUhle7bRa07C8uDDd6trmU3TCDbQ9UAWT5yOnmTLVzAzejHSriyon
-      9tW1fkM9cUYHPsBPk1r55U6I04vSQ2B4AEUIK7c/cQKBgQDqafaj2BVFlt52Scgr
-      azSAtYyj4mPOPqOz3SzqKW9AVo2fFoYlfRy+8xuamSBjBAEdhoPPMN3G8WnG2mpB
-      Z/0I6CPblTabqIyI8fIhoa6rXxqgPmNITXAWqNbMXZ4SIrbipI3KfkQycXUFRPBz
-      XbkS0LrtuFJzeYo0EUWo+aw0+QKBgQC8KiqUs+yt3SD+HBtRa1xJK/p8OwmH9MIz
-      4BGp+ahx6y02zfaoKJuRIS9AlGMPn3hc1gn1tZh1i1Iy/PLe89/cbftV1qHyzQDq
-      WKRkDW0qubwJR94DY1vTHQkdnUnCd1TTtUFhBHopHpeHPJEvy785qWlQBdPtKKNz
-      FA4xqvBGgwKBgQDDCzv/BBJe/rNHdQiqp97doTHOQtaMiy4mwEdY5vT8cYgQ8OrZ
-      UoqSjzFOp059VJ2g9YXC5YQCvmgm3yE+Hso5mP4M/NCdH9cfM0EmnqL5UH6VCpQN
-      WvGCySVAkjyuFlhZqFWaQQl5d1HI+p2fQEJ311lR5uYj0uMdg6mUeXnB8QKBgEHS
-      CjUcP0WOXbUmBdRUVuLttGBykmHxl2FoFyW7RFYdKyLJp2epVMnOruXLQl+7q/Hl
-      mXRPArbTdnyJiTe+XWeRPWMIgnwZhCF1woORQse4UvN4JUxQHFXcCU1HsP6Kmay4
-      8dbLJyRtJBpVcIAkqI62GTW55ClIluxxbomnPwebAoGBAJmVnxJNMPw9HM9x1uPx
-      VZAAYcbKKoqFj/ZyAomKj5nf3CGI1f9xalUx9BQDoGqLmHTFh/npYJW4lbJM0aQ+
-      NbSfihRCzO9gEs5Q7ohdfDM9G5MdiFWEw5IUqJk/IVPp0NADZ9G9FOs6bVpDhlHQ
-      5aS2japQDUT8cOQywR1eNqMP
-      -----END PRIVATE KEY-----
-
-    termination: reencrypt
   to:
     kind: Service
     name: keycloak
     weight: 100
-  wildcardPolicy: None
+  tls:
+    termination: reencrypt
+    wildcardPolicy: None
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      MIIDLzCCAhcCFG89l5QWz6UHfSawKVKVc97rPdCwMA0GCSqGSIb3DQEBCwUAMFQx
+      LTArBgNVBAMMJGtleWNsb2FrLW5tLXNzby5hcHBzLm9jcDAwMS5yaGxhYi5jaDEL
+      MAkGA1UEBhMCVVMxFjAUBgNVBAcMDVNhbiBGcmFuc2lzY28wHhcNMjIwODIzMTY1
+      ODMwWhcNMjQwODIyMTY1ODMwWjBUMS0wKwYDVQQDDCRrZXljbG9hay1ubS1zc28u
+      YXBwcy5vY3AwMDEucmhsYWIuY2gxCzAJBgNVBAYTAlVTMRYwFAYDVQQHDA1TYW4g
+      RnJhbnNpc2NvMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAj/aWIrau
+      2cb/y9I/de3R3cqUXvxJVT9pZIuCdOH6UsCqWFHd24o8kGeCvljD3kHX2/tM5u3x
+      kiI8wY/cR/YnhQgC+cAzC9TQa3oiJAqf2z0NeKyPGFM0OTtFgYhTNT/lt7RYbXoN
+      +9kYSKwWQIdcJ5geLNRx7DUvsmW6B6AGKXikJIyJCH4wAzBzpNIs22TVk+A880OH
+      yuEIIih6NaQzVRGglKlLWHcXLoQdSp8eDZYO0W1aYEVTMTp/I7LS8GS1aXaOjG0g
+      6Re6f93wWz4v0VuVRe8MmZyorbRhL4nfG0gt5mK/85ybL6+LqOflK7WaMilb3KRa
+      rpZrei+y/IIT4QIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQB/LDxjjBF8usMCEGbH
+      IzCbgsTRBK0ZKqWBLemY70b1a4MH/GxUjWj6qKgI0BpP2ArEtmKoEBpGJC3N8KnZ
+      3A90r9Xnp83vvKPv9sxhd4/yGR0Bu0CJazx4IvKxVjQO8zyecRTQ8RkMYmlJpfuI
+      esBV5FmcAWvHTstzQU8/0J6nKjVMR0A4F9POLKsGvDkYIDKo5gFP23pkr4Mi6sJh
+      ojMX1pTX7jGFay66Dtj5jW0E//HYAf0MvnDwtC461TyOO0LOzDzBTKrv/tDERRuM
+      1/NYqyxwObsUSuQlC96L1H5momzY6Pgb64zDv6fp3KKMwYX/u5/bZF4mADaUjLQA
+      F6Ub
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCP9pYitq7Zxv/L
+      0j917dHdypRe/ElVP2lki4J04fpSwKpYUd3bijyQZ4K+WMPeQdfb+0zm7fGSIjzB
+      j9xH9ieFCAL5wDML1NBreiIkCp/bPQ14rI8YUzQ5O0WBiFM1P+W3tFhteg372RhI
+      rBZAh1wnmB4s1HHsNS+yZboHoAYpeKQkjIkIfjADMHOk0izbZNWT4DzzQ4fK4Qgi
+      KHo1pDNVEaCUqUtYdxcuhB1Knx4Nlg7RbVpgRVMxOn8jstLwZLVpdo6MbSDpF7p/
+      3fBbPi/RW5VF7wyZnKittGEvid8bSC3mYr/znJsvr4uo5+UrtZoyKVvcpFqulmt6
+      L7L8ghPhAgMBAAECggEAAJTMFsgw1oinwCJRYHmDiM2B+3KYHTPMI7xiD3S/tpVr
+      WqXuxMclgKbz75U0kHFcAybCZCBLz5cIMpCqumoNAmV9ry9Bq+eOqKoHX0JHuPJH
+      9Qr4g1TURIx8g434WaIWnFiqQe7lnygWOzZ7dIRw/Wi8BNq3hwhqVxVzQqEFXvKv
+      /mQ6ZUt8VNgxpMMOXX+ZzQSgv6MhyQoa9gvLOk5JZSaEbPlWOrIusOtF/maLWS9U
+      WGD+Mu3Gpoh1a9q41fKrcrn615lkGg3YzExxNUGMtxpN3f4iXx9mEc+hh6BZefcF
+      0sWIB9C8G7eul9Sz1S/AqUOri+61ObH6mDZDMjtDAQKBgQC2Ua4G/uzcq516NH5a
+      pyTg7WqNvJSFt5Hne+7ye+WMmrPalaQaSU57H3ceIv02xY5uYcMYAGO3IYhJjX+y
+      KdYN+xgfV06mGqcxPlrKZmpd9RZIRKUlbut9VFTJreKhUWrhsuuoF9sHWbp8WuMU
+      dbDOH8/l+UoDQJRz5EWpQv420QKBgQDKJLLKGABecGoPilp4dti5a80tswakQXfD
+      CuNZ9pYcuhBli4mKz63xfMylTKaYyfx4qfffw/HiMjoXGQ9v2WsNy81XClLSB/Vr
+      gn09d94aX0BMhji3UTossbSYayFvBSxBwey9KJvrPzr/6Lnejo8abDMjEVph4CsY
+      fUjYSpVwEQKBgCaQ2pYiQKphJvudtQiqCJQHxJ1cwbITZaqovZ/Pc3wtkVPwiXkB
+      /rburfzS++slGP7icSlXk8A+OJ0OcG+Yh+4HKlAe4MUkKC+zd/MOfPuJB4Cb/K8R
+      aoDlYNYUkTb8iPZbKZwyB6PjaB47/4Lpbk/7zLdh5zUO6RgmtlGamTmxAoGBAK2E
+      UvSnJanrVR+B46cEXYTMxJM12b2ldOg3sHDI+pIuJWUFIkvFecqRFhnOcjM1L0Nk
+      oyGxUTCZbMPm/xlDyGFPUDQm6HDh5AklOdxJyJ1aphcKICU71HQJFry/OTPTfOn1
+      TQISmcSVwk9ptiMUvEIyHrM7choSEuwynxUK8LwBAoGBAIpzLRhuEiytOACEf5Jx
+      55YsQixWS3ruMWPm2jkq7KRfBEsR0H2CQbWgioxFFgBQijL2XJVWiUQ++ODk4+/p
+      VnV9I11n6UHDZMkaSe7XsJVj3weGgQxJqcC0Dskyzom3FzpVcarY9vQWGhlyOyy1
+      9hYkoRv8CveTYDKRktO+UVYe
+      -----END PRIVATE KEY-----

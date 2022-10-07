@@ -163,3 +163,14 @@
       sso-clients.yaml
   tags:
     - sso
+
+
+- name: "create sso route"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    template:
+      route.yaml.j2
+  tags:
+    - sso

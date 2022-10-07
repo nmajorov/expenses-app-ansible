@@ -13,10 +13,11 @@ spec:
     - name: GOALS
       value: "clean test"
     - name: keycloak_url
-      value: "https://keycloak-nm-sso.apps-crc.testing"
+      value: "https://keycloak-nm-sso.apps.ocp001.rhlab.ch"
+    - name: database-service-name
+      value: knm
   workspaces:
     - name: input
-      emptyDir: {}
-      
-      #persistentVolumeClaim:
-      #  claimName: source-pvc
+      #emptyDir: {}
+      persistentVolumeClaim:
+        claimName: source-pvc
