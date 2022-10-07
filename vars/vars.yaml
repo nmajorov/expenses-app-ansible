@@ -1,1 +1,6 @@
-rhlab-vars.yaml
+---
+
+# minimum settings
+sso_operator_namespace: "nm-sso"
+#namespace there demo should be deployed
+app_namespace: "nm-demo"
