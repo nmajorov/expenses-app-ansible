@@ -76,7 +76,7 @@
 - name: "get full sso url from route"
   ansible.builtin.shell: |
     {{ openshift_cli }} get route -n {{ sso_operator_namespace }} \
-    keycloak-https -o jsonpath=\{.spec.host\}
+    keycloak -o jsonpath=\{.spec.host\}
     exit 0
   register: ssohost
 
@@ -84,7 +84,7 @@
 - name: "show backend build variables"
   ansible.builtin.debug:
     msg:
-      - "run pipeline with params" 
+      - "run pipeline with params"
       - " branch: {{ app_backend_git_revision }} "
       - " sso url: https://{{ ssohost.stdout }} "
 
@@ -96,5 +96,3 @@
     namespace: "{{ app_namespace }}"
     template:
       backend/pipeline-run.yaml.j2
-
-

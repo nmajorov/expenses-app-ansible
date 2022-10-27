@@ -21,6 +21,11 @@ spec:
         description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
         default: "false"
         type: string
+      - name: STORAGE_DRIVER
+        description: Set buildah storage driver
+        type: string
+        default: vfs
+
   outputs:
     resources:
       - name: image
@@ -36,32 +41,40 @@ spec:
         cat src/main/docker/Dockerfile.native
 
         echo
-        echo "run buildah "
+        buildah version
         echo
-        buildah bud  --tls-verify=$(inputs.params.TLSVERIFY) \
+        echo
+        echo "run buildah "
+        echo " output image:  $(outputs.resources.image.url)"
+        echo
+        buildah --storage-driver=$(inputs.params.STORAGE_DRIVER) bud  --tls-verify=$(inputs.params.TLSVERIFY) \
           --layers -f src/main/docker/Dockerfile.native -t  $(outputs.resources.image.url) .
+
+      
+        echo
+        echo
+        echo
+        echo "push image"
+        buildah --storage-driver=$(inputs.params.STORAGE_DRIVER) push --tls-verify=$(inputs.params.TLSVERIFY) \
+          $(outputs.resources.image.url) docker://$(outputs.resources.image.url)
+
 
       volumeMounts:
         - name: varlibcontainers
           mountPath: /var/lib/containers
         - name: gen-source
           mountPath: /gen-source
-      securityContext:
-        privileged: true
+        - name: devfuse
+          mountPath: /dev/fuse
+    # securityContext:
+    #   privileged: true
 
-
-    - name: push
-      image: quay.io/buildah/stable
-      command: ['buildah', 'push', '--tls-verify=$(inputs.params.TLSVERIFY)', '$(outputs.resources.image.url)', 'docker://$(outputs.resources.image.url)']
-      volumeMounts:
-        - name: varlibcontainers
-          mountPath: /var/lib/containers
-      securityContext:
-        privileged: true
   volumes:
     - name: varlibcontainers
       emptyDir: {}
     - name: gen-source
+      emptyDir: { }
+    - name: devfuse
       emptyDir: { }
   workspaces:
     - name: input

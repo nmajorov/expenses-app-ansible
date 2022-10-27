@@ -158,6 +158,7 @@
 # if cluster has a valid certificate
 - name: "create route reencrypt"
   ansible.builtin.shell: |
+    {{ openshift_cli }} delete  routes keycloak  --ignore-not-found -n {{ sso_operator_namespace }}
     {{ openshift_cli }} create route reencrypt --service keycloak --port 8443  -n {{ sso_operator_namespace }}
     exit 0
   when: tls_route is not defined
