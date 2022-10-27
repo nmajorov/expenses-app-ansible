@@ -100,3 +100,5 @@ spec:
       params:
         - name: keycloak_url
           value: "$(params.keycloak_url)"
+        - name: database-service-name
+          value:  "$(params.database-service-name)"

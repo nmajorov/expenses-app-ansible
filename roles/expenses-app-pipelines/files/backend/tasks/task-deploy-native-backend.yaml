@@ -24,9 +24,11 @@ spec:
         type: string
         default: root
         description: default database
+
       - name: database-service-name
         type: string
-        default: sso-test-postgresql
+        default: knm
+
       - name: keycloak_url
         type: string
         default: sso-test:8080
