@@ -2,7 +2,7 @@
 
 openshift_cli: oc
 
-
+sso_operator_namespace: nm-sso
 postgresql_database: "root"
 postgresql_user: "keycloak"
 postgresql_password: "keycloak"

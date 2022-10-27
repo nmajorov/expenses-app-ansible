@@ -1,0 +1,77 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ database_deployment_name }}-pvc
+  labels:
+    app: {{database_deployment_name}}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    app.openshift.io/runtime: postgresql
+  name: {{database_deployment_name}}
+  labels:
+    app: {{database_deployment_name}}
+spec:
+  replicas: 1
+  selector:
+    app: {{database_deployment_name}}
+  template:
+    metadata:
+      labels:
+        app: {{database_deployment_name}}
+    spec:
+      containers:
+        - name: {{database_deployment_name}}
+          image: registry.redhat.io/rhel8/postgresql-10
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRESQL_DATABASE
+              value: {{ postgresql_database }}
+            - name: POSTGRESQL_USER
+              value: {{ postgresql_user }}
+            - name: POSTGRESQL_PASSWORD
+              value: {{ postgresql_password }}
+          volumeMounts:
+            - mountPath: "/var/lib/pgsql/data"
+              name: "fuse-pgdata"
+          readinessProbe:
+            tcpSocket:
+              port: 5432
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+      volumes:
+        - name: fuse-pgdata
+          persistentVolumeClaim:
+            claimName: {{database_deployment_name}}-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ database_deployment_name }}"
+  labels:
+    app: {{database_deployment_name}}
+spec:
+  ports:
+  - name: "{{ database_deployment_name }}"
+    nodePort: 0
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: {{database_deployment_name}}
+    deploymentconfig: {{database_deployment_name}}
+  sessionAffinity: None
+  type: ClusterIP

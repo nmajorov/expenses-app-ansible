@@ -25,13 +25,18 @@
   check_mode: false
   changed_when: false
   failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
-
+  tags:
+    - backend
+    - full-app-deploy
 
 - debug:
       msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+  tags:
+    - backend
+    - full-app-deploy
 
 
-- name: Create Namespace for sso
+- name: Create Namespace for application
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -41,9 +46,11 @@
       metadata:
         name: "{{ app_namespace }}"
   tags:
-    - sso
+    - backend
+    - full-app-deploy
 
 
-- import_tasks: sso-operator.yaml
+- import_tasks: backend.yaml
   tags:
     - backend
+    - full-app-deploy

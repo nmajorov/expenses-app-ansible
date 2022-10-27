@@ -2,3 +2,8 @@
 ansible-navigator:
   execution-environment:
     image: docker.io/nmajorov/nm-ansible-runner:2.0
+    container-engine: podman
+    # volume-mounts:
+    #  - src: "vars"
+    #    dest: "/vars"
+    #    options: "Z"

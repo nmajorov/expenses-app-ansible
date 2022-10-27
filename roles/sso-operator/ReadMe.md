@@ -2,5 +2,7 @@
 
 
 
+Variables:
 
+**wildcard_domain** is mandatory
 

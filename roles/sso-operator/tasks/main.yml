@@ -27,8 +27,22 @@
   failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
 
 
+
 - debug:
       msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+
+
+
+- name: check wildcard domain for tls_route
+  ansible.builtin.debug:
+    msg: 
+      - "wildcard domain is set {{ wildcard_domain is defined }} "
+      - "tls_route is defined: {{ tls_route is defined }}"
+  failed_when:
+    - wildcard_domain is not defined
+    - tls_route is defined
+  tags:
+    - sso
 
 
 - import_tasks: sso-operator.yaml

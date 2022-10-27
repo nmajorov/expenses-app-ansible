@@ -122,16 +122,6 @@
     - sso
 
 
-- name: "create a https route to keycloak"
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
-    namespace: "{{ sso_operator_namespace }}"
-    template:
-      route.yaml.j2
-  tags:
-    - sso
-
 - name: "create basic realm"
   kubernetes.core.k8s:
     state: present
@@ -161,5 +151,28 @@
     namespace: "{{ sso_operator_namespace }}"
     src:
       sso-clients.yaml
+  tags:
+    - sso
+
+
+# if cluster has a valid certificate
+- name: "create route reencrypt"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} delete  routes keycloak  --ignore-not-found -n {{ sso_operator_namespace }}
+    {{ openshift_cli }} create route reencrypt --service keycloak --port 8443  -n {{ sso_operator_namespace }}
+    exit 0
+  when: tls_route is not defined
+  tags:
+    - sso
+
+
+- name: "create a https route to keycloak"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    template:
+      route.yaml.j2
+  when: tls_route is defined
   tags:
     - sso

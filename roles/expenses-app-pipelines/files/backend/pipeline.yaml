@@ -1,0 +1,104 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-and-deploy-backend
+spec:
+  workspaces:
+    - name: shared-workspace
+      description: |
+        This workspace will receive the cloned git repo and be passed
+        to the next Task.
+  params:
+    - name: git-url
+      type: string
+      default: "https://github.com/nmajorov/expenses-backend-quarkus.git"
+    - name: git-revision
+      type: string
+      default: "master"
+    - name: keycloak_url
+      type: string
+    - name: sso-service-name
+      type: string
+      default: "sso-test"
+    - name: database-service-name
+      type: string
+      default: "knm"
+  resources:
+    - name: backend-image
+      type: image
+  tasks:
+    - name: clean-workspace
+      taskRef:
+        name: clean-up-backend
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: fetch-repository
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      runAfter:
+        - clean-workspace
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+        - name: deleteExisting
+          value: "false"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: test
+      taskRef:
+        name: backend-mvn
+      runAfter:
+        - fetch-repository
+      params:
+        - name: keycloak_url
+          value: "$(params.keycloak_url)"
+        - name: database-service-name
+          value:  "$(params.database-service-name)"
+      workspaces:
+        - name: input
+          workspace: shared-workspace
+
+    - name: build-quarkus-native
+      taskRef:
+        name: backend-mvn
+      params:
+        - name: GOALS
+          value: "clean package -Pnative -e -B -DskipTests -Dmaven.javadoc.skip=true -Dmaven.site.skip=true -Dmaven.source.skip=true -Djacoco.skip=true -Dcheckstyle.skip=true -Dfindbugs.skip=true -Dpmd.skip=true -Dfabric8.skip=true"
+        - name: keycloak_url
+          value: "$(params.keycloak_url)"
+      runAfter:
+        - test
+      workspaces:
+        - name: input
+          workspace: shared-workspace
+
+    - name: push-image
+      taskRef:
+        name: push-image
+      runAfter:
+        - build-quarkus-native
+      resources:
+        outputs:
+          - name: image
+            resource: backend-image
+      workspaces:
+        - name: input
+          workspace: shared-workspace
+
+    - name: deploy-quarkus-native
+      taskRef:
+        name: deploy-native-backend
+      runAfter:
+        - push-image
+      params:
+        - name: keycloak_url
+          value: "$(params.keycloak_url)"
+        - name: database-service-name
+          value:  "$(params.database-service-name)"
