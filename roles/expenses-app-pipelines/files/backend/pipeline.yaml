@@ -79,24 +79,30 @@ spec:
         - name: input
           workspace: shared-workspace
 
-    - name: push-image
+    - name: "docker-build-push"
       taskRef:
-        name: push-image
+        name: "buildah"
       runAfter:
-        - build-quarkus-native
-      resources:
-        outputs:
-          - name: image
-            resource: backend-image
+        - "build-quarkus-native"
+      params:
+        - name: IMAGE
+          value: "image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/expenses-backend-quarkus:latest"
+        - name: TLSVERIFY
+          value: false
+        - name: DOCKERFILE
+          value: src/main/docker/Dockerfile.native
+        - name: SKIP_PUSH
+          value: false
       workspaces:
-        - name: input
+        - name: source
           workspace: shared-workspace
+
 
     - name: deploy-quarkus-native
       taskRef:
         name: deploy-native-backend
       runAfter:
-        - push-image
+        - "docker-build-push"
       params:
         - name: keycloak_url
           value: "$(params.keycloak_url)"

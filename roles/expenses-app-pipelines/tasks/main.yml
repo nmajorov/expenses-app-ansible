@@ -50,6 +50,35 @@
     - full-app-deploy
 
 
+- name: "deploy buildah tekton pipline tasks"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+    - backend/tasks/buildah.yaml
+  tags:
+    - backend
+    - full-app-deploy
+
+- name: "add admin to pipline service account"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} policy add-role-to-user \
+       admin system:serviceaccount:{{ app_namespace}}:pipeline \
+      -n {{ app_namespace}}
+
+    echo
+    echo "add scc to sa pipeline"
+    {{ openshift_cli }} adm policy add-scc-to-user  privileged -z pipeline -n {{ app_namespace}}
+
+    exit 0
+  changed_when: false
+  tags:
+    - backend
+    - full-app-deploy
+
+
 - import_tasks: backend.yaml
   tags:
     - backend

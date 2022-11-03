@@ -6,13 +6,7 @@
       - "deploy backend pipeline in namespace '{{ app_namespace }}'"
       - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
-- name: "add admin to pipline service account"
-  ansible.builtin.shell: |
-    {{ openshift_cli }} policy add-role-to-user \
-       admin system:serviceaccount:{{ app_namespace}}:pipeline \
-      -n {{ app_namespace}}
-    exit 0
-  changed_when: false
+
 
 
 - name: "deploy backend workspace pvc"
@@ -21,14 +15,6 @@
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
     src: backend/resources/pvc-workspace.yaml
-
-- name: "backend: deploy pipeline backend image resource"
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
-    namespace: "{{ app_namespace }}"
-    template:
-      backend/image-resource.j2
 
 
 - name: "backend: deploy backend database"
@@ -44,8 +30,11 @@
 - name: "backend: delete tasks if exists"
   # to redeploy we need to delete tasks first
   ansible.builtin.shell: |
-    {{ openshift_cli }} delete tasks.tekton.dev \
-    --ignore-not-found=true --all -n {{ app_namespace}}
+    {{ openshift_cli }} delete tasks.tekton.dev  backend-mvn  \
+      clean-up-backend  \
+      deploy-native-backend \
+      deploy-postgresql   \
+      push-image   --ignore-not-found=true -n {{ app_namespace}}
      exit 0
   changed_when: false
 
