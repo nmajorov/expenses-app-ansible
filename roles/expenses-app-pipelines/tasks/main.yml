@@ -27,6 +27,7 @@
   failed_when: (ocresult.rc != 0) or ( ocresult.stderr != "")
   tags:
     - backend
+    - web
     - full-app-deploy
 
 - debug:
@@ -34,6 +35,7 @@
   tags:
     - backend
     - full-app-deploy
+    - web
 
 
 - name: Create Namespace for application
@@ -48,7 +50,7 @@
   tags:
     - backend
     - full-app-deploy
-
+    - web
 
 - name: "deploy buildah tekton pipline tasks"
   kubernetes.core.k8s:
@@ -57,10 +59,11 @@
     namespace: "{{ app_namespace }}"
     src: "{{ item }}"
   loop:
-    - backend/tasks/buildah.yaml
+    - common/tekton-task/buildah.yaml
   tags:
     - backend
     - full-app-deploy
+    - web
 
 - name: "add admin to pipline service account"
   ansible.builtin.shell: |
@@ -77,9 +80,15 @@
   tags:
     - backend
     - full-app-deploy
-
+    - web
 
 - import_tasks: backend.yaml
+  tags:
+    - backend
+    - full-app-deploy
+
+
+- import_tasks: webapp.yaml
   tags:
     - backend
     - full-app-deploy

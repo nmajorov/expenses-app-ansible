@@ -1,0 +1,42 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: deploy-nodejs-app
+spec:
+  params:
+    - name: VERSION
+      description: The version of the nodejs web ui  build image to deploy
+      default: 'latest'
+      type: string
+
+
+  steps:
+
+    - name: deploy-app
+      image: quay.io/openshift/origin-cli:latest
+      command: ["/bin/bash", "-c"]
+      workingDir: /workspace/input-ui-source
+      args:
+        - |-
+
+          oc get svc/nodejs-gui
+          if [[ $? -ne 0 ]]
+              then
+          	    oc new-app --name=nodejs-gui --image-stream=gui:latest
+                oc expose svc nodejs-gui
+
+              else
+                echo "Application already exists."
+          	    oc delete all --selector=app=nodejs-gui
+                oc new-app --name=nodejs-gui --image-stream=gui:latest
+                oc expose svc nodejs-gui
+          fi
+          
+          echo "add nice nodejs icon on top"
+
+          oc label deployment/nodejs-gui  app.kubernetes.io/name=nodejs --overwrite
+
+
+  workspaces:
+   - name: input
+     mountPath: /workspace/input-ui-source

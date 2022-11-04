@@ -2,21 +2,19 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: clean-up-backend
+  name: clean-up
 
 spec:
-
-
   params:
     - name: keep-repo
       type: string
       description: "keep maven repo for next builds to speed up development"
-      default: "true"
+      default: "false"
 
   steps:
     - name: clean
       image: quay.io/openshift/origin-cli:latest
-      workingDir: /workspace/output
+      workingDir: /workspace/input-ui-source
       script: |
         #!/usr/bin/env bash
         set -x
@@ -34,8 +32,8 @@ spec:
 
 
         ls -lisa
-
+        df -h
 
   workspaces:
-    - name: output
-      mountPath: /workspace/output
+    - name: input
+      mountPath: /workspace/input-ui-source

@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: test-nodejs-app
+spec:
+  params:
+    - name: VERSION
+      description: The version of the nodejs
+      default: '10'
+      type: string
+  steps:
+      - name: test-app
+        image: 'registry.access.redhat.com/rhscl/nodejs-$(inputs.params.VERSION)-rhel7'
+        workingDir: /workspace/input-ui-source
+        command: ["/bin/bash", "-c"]
+        args:
+          - |-
+            echo "test project"
+            pwd
+            ls
+            echo "current git branch: $(git rev-parse --abbrev-ref HEAD)"
+
+            echo "install yarn first"
+            npm install -g yarn
+            yarn --version
+            echo "install dependencies"
+            yarn install
+
+            echo "add react-scripts"
+            yarn add react-scripts
+
+            echo "run tests"
+            yarn test
+  workspaces:
+    - name: input
+      mountPath: /workspace/input-ui-source

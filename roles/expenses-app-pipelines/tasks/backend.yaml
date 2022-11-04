@@ -27,8 +27,8 @@
 
 
 
-- name: "backend: delete tasks if exists"
-  # to redeploy we need to delete tasks first
+- name: "backend: delete tekton-task if exists"
+  # to redeploy we need to delete tekton-task first
   ansible.builtin.shell: |
     {{ openshift_cli }} delete tasks.tekton.dev  backend-mvn  \
       clean-up-backend  \
@@ -39,18 +39,18 @@
   changed_when: false
 
 
-- name: "backend: deploy tasks"
+- name: "backend: deploy tekton-task"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
     src: "{{ item }}"
   loop:
-    - backend/tasks/task-clean-up.yaml
-    - backend/tasks/task-deploy-native-backend.yaml
-    - backend/tasks/task-deploy-postgresql.yaml
-    - backend/tasks/task-mvn.yaml
-    - backend/tasks/task-push-image.yaml
+    - backend/tekton-task/task-clean-up.yaml
+    - backend/tekton-task/task-deploy-native-backend.yaml
+    - backend/tekton-task/task-deploy-postgresql.yaml
+    - backend/tekton-task/task-mvn.yaml
+    - backend/tekton-task/task-push-image.yaml
 
 
 - name: "backend: deploy pipeline"
