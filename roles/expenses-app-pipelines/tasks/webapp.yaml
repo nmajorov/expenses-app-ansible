@@ -1,0 +1,29 @@
+---
+- name: "webapp: deploy webapp message"
+  ansible.builtin.debug:
+    msg:
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+      - "deploy webapp pipeline in namespace '{{ app_namespace }}'"
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+- name: "webapp: delete tekton-task if exists"
+  # to redeploy we need to delete tekton-task first
+  ansible.builtin.shell: |
+    {{ openshift_cli }} delete tasks.tekton.dev  build-nodejs-app  \
+     --ignore-not-found=true -n {{ app_namespace}}
+     exit 0
+  changed_when: false
+
+
+- name: "webapp: deploy tekton-task"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+    - webapp/tekton-tasks/build-nodejs-app.yaml
+    - webapp/tekton-tasks/deploy-task.yaml
+    - webapp/tekton-tasks/task-clean-up.yaml
+    - webapp/tekton-tasks/test-nodejs-app-task.yaml
+    - webapp/tekton-tasks/webapp-build-runtime-task.yaml
