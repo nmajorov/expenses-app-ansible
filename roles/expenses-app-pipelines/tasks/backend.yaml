@@ -35,6 +35,9 @@
       deploy-native-backend \
       deploy-postgresql   \
       push-image   --ignore-not-found=true -n {{ app_namespace}}
+
+    {{ openshift_cli }} delete pipelines.tekton.dev build-and-deploy-backend \
+      --ignore-not-found=true -n {{ app_namespace}}
      exit 0
   changed_when: false
 
@@ -63,7 +66,7 @@
 
 
 
-- name: "show backend build variables"
+- name: "backend: show backend build variables"
   ansible.builtin.debug:
     msg:
       - "run pipeline with params"
@@ -71,7 +74,7 @@
       - " sso url: https://{{ ssohost.stdout }} "
 
 
-- name: "create a pipline run backend "
+- name: "backend: create a pipline run backend "
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
