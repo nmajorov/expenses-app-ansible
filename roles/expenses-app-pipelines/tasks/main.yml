@@ -82,6 +82,22 @@
     - full-app-deploy
     - web
 
+
+
+
+- name: "get full sso url from route"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get route -n {{ sso_operator_namespace }} \
+    keycloak -o jsonpath=\{.spec.host\}
+    exit 0
+  register: ssohost
+  tags:
+    - backend
+    - full-app-deploy
+    - web
+
+
+
 - import_tasks: backend.yaml
   tags:
     - backend
@@ -90,5 +106,5 @@
 
 - import_tasks: webapp.yaml
   tags:
-    - backend
+    - web
     - full-app-deploy

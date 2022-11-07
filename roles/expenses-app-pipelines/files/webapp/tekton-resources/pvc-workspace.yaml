@@ -1,0 +1,12 @@
+# create a claim for webapp workspace
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ui-source-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi

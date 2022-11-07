@@ -1,0 +1,28 @@
+# run pipeline on master branch
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: expenses-webui
+spec:
+  pipelineRef:
+    name: build-expenses-web-ui
+  params:
+    - name: GIT_URL
+      value: 'https://github.com/nmajorov/expenses-web-ui.git'
+    - name: GIT_REVISION
+      value: "{{ app_frontend_git_revision }}"
+    - name: SSO_URL
+      value: 'https://{{ ssohost.stdout }}'
+    - name: BACKEND_URL
+      value: 'http://expenses-backend-quarkus-nm-demo.apps.p30775tl.westeurope.aroapp.io'
+  resources:
+    - name: ui-image
+      resourceRef:
+        name: ui-image
+  workspaces:
+    - name: ui-workspace
+      persistentVolumeClaim:
+        claimName: ui-source-pvc
+ # taskRunSpecs:
+ #   - pipelineTaskName: webapp-build-runtime
+ #     taskServiceAccountName: builder

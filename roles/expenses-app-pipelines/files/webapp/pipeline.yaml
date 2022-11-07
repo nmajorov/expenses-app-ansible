@@ -1,0 +1,111 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-expenses-web-ui
+spec:
+  params:
+    - name: GIT_URL
+      description: "git url of client"
+      default: https://github.com/nmajorov/expenses-web-ui.git
+    - name: GIT_REVISION
+      default: master
+    - name: SSO_URL
+      default: http://sso-test:8080/auth/
+
+    # full external url of backend app
+    - name: BACKEND_URL
+
+  resources:
+    - name: ui-image
+      type: image
+
+
+  workspaces:
+    - name: ui-workspace
+      description: |
+        This workspace will receive the cloned git repo and be passed
+        to the next Task.
+
+  tasks:
+    - name: clean-workspace
+      taskRef:
+        name: clean-up
+      workspaces:
+        - name: input
+          workspace: ui-workspace
+    - name: clone
+      taskRef:
+        name: git-clone
+        kind: ClusterTask
+      runAfter:
+        - clean-workspace
+      params:
+        - name: url
+          value: $(params.GIT_URL)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: ui-workspace
+    - name: test
+      taskRef:
+        name: test-nodejs-app
+      runAfter:
+        - clone
+      workspaces:
+        - name: input
+          workspace: ui-workspace
+
+  
+    - name: build-nodejs-app
+      taskRef:
+        name: build-nodejs-app
+      params:
+        - name: sso-url
+          value: $(params.SSO_URL)
+        - name: backend-url
+          value: $(params.BACKEND_URL)
+      runAfter:
+        - test
+      workspaces:
+        - name: input
+          workspace: ui-workspace
+
+    - name: create-docker-file
+      taskRef:
+        name: webapp-build-runtime
+      runAfter:
+        - build-nodejs-app
+      workspaces:
+        - name: input
+          workspace: ui-workspace
+
+    - name: "docker-build-push"
+      taskRef:
+        name: "buildah"
+      runAfter: 
+        - "create-docker-file"  
+      params:
+        - name: IMAGE
+          value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/gui:latest
+        - name: TLSVERIFY
+          value: false
+        - name: DOCKERFILE
+          value: Dockerfile.gen
+        - name: SKIP_PUSH
+          value: false    
+      workspaces:
+        - name: source
+          workspace: ui-workspace
+           
+    - name: deploy-nodejs-app
+      taskRef:
+        name: deploy-nodejs-app
+      runAfter:
+        - docker-build-push
+      workspaces:
+        - name: input
+          workspace: ui-workspace

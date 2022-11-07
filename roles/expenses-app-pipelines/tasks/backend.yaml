@@ -46,11 +46,11 @@
     namespace: "{{ app_namespace }}"
     src: "{{ item }}"
   loop:
-    - backend/tekton-task/task-clean-up.yaml
-    - backend/tekton-task/task-deploy-native-backend.yaml
-    - backend/tekton-task/task-deploy-postgresql.yaml
-    - backend/tekton-task/task-mvn.yaml
-    - backend/tekton-task/task-push-image.yaml
+    - backend/tekton-tasks/task-clean-up.yaml
+    - backend/tekton-tasks/task-deploy-native-backend.yaml
+    - backend/tekton-tasks/task-deploy-postgresql.yaml
+    - backend/tekton-tasks/task-mvn.yaml
+    - backend/tekton-tasks/task-push-image.yaml
 
 
 - name: "backend: deploy pipeline"
@@ -61,13 +61,6 @@
     src:
       backend/pipeline.yaml
 
-
-- name: "get full sso url from route"
-  ansible.builtin.shell: |
-    {{ openshift_cli }} get route -n {{ sso_operator_namespace }} \
-    keycloak -o jsonpath=\{.spec.host\}
-    exit 0
-  register: ssohost
 
 
 - name: "show backend build variables"
