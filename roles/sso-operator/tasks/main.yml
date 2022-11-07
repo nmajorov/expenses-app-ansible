@@ -33,9 +33,9 @@
 
 
 
-- name: check wildcard domain for tls_route
+- name: "sso: check wildcard domain for tls_route"
   ansible.builtin.debug:
-    msg: 
+    msg:
       - "wildcard domain is set {{ wildcard_domain is defined }} "
       - "tls_route is defined: {{ tls_route is defined }}"
   failed_when:
@@ -45,6 +45,17 @@
     - sso
 
 
+- name: "sso: check if operator already installed"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pods -l name=rhsso-operator   -n {{ sso_operator_namespace }} --ignore-not-found \
+    | wc -l
+    exit 0
+  register: ssopodsrunning
+  tags:
+    - sso
+
+
 - import_tasks: sso-operator.yaml
+  when: "'0' in ssopodsrunning.stdout"
   tags:
     - sso
