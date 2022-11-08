@@ -9,7 +9,7 @@ spec:
       - name: VERSION
         type: string
         description: The version of the build image
-        default: '21.3'
+        default: '21.3.nm002-jdk11'
       - name: GOALS
         description: The Maven goals to run
         type: string

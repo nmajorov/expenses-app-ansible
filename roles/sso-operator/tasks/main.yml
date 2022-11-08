@@ -38,6 +38,7 @@
     msg:
       - "wildcard domain is set {{ wildcard_domain is defined }} "
       - "tls_route is defined: {{ tls_route is defined }}"
+  #    - " route cert: {{ tls }}"
   failed_when:
     - wildcard_domain is not defined
     - tls_route is defined
@@ -57,5 +58,32 @@
 
 - import_tasks: sso-operator.yaml
   when: "'0' in ssopodsrunning.stdout"
+  tags:
+    - sso
+
+- name: "sso: Remove an existing route object"
+  ansible.builtin.shell:
+    cmd: |
+      {{openshift_cli }} delete --ignore-not-found route keycloak -n {{ sso_operator_namespace  }}
+
+  tags:
+    - sso 
+# oc delete routes keycloak
+- name: "sso: create a https route"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    definition: "{{ lookup('file','{{custom_route }}') | from_yaml }}"
+  when: tls_route is defined
+  tags:
+    - sso
+
+# if cluster has a valid certificate
+- name: "sso: create route if cluster has valid cert"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} create route reencrypt --service keycloak --port 8443  -n {{ sso_operator_namespace }}
+    exit 0
+  when: tls_route is not defined
   tags:
     - sso

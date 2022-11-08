@@ -3,6 +3,7 @@
         "kubeconfig"
     ],
     "cSpell.words": [
+        "keycloak",
         "quarkus",
         "tekton"
     ]
