@@ -1,5 +1,5 @@
 ---
-
+# old --- not used solution ... just keep as example
 # deploy SSO and postgresql database
 # expenses app server and client using SSO for users authorisation/authentications
 apiVersion: tekton.dev/v1alpha1
