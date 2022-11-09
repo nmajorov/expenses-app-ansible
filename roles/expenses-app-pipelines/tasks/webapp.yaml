@@ -16,6 +16,20 @@
 
 
 
+- name: "webapp: remove previous tekton-task"
+  kubernetes.core.k8s:
+    state: absent 
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+    - webapp/tekton-resources/pvc-workspace.yaml
+    - webapp/tekton-tasks/build-nodejs-app.yaml
+    - webapp/tekton-tasks/deploy-task.yaml
+    - webapp/tekton-tasks/task-clean-up.yaml
+    - webapp/tekton-tasks/test-nodejs-app-task.yaml
+    - webapp/tekton-tasks/webapp-build-runtime-task.yaml
+    - webapp/pipeline.yaml
 
 
 - name: "webapp: deploy tekton-task"
@@ -44,10 +58,10 @@
       - " sso url: https://{{ ssohost.stdout }} "
 
 
-- name: "create a pipline run backend "
+- name: "webapp: run a  pipeline"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ app_namespace }}"
     template:
-      backend/pipeline-run.yaml.j2
+      webapp/pipelinerun.yaml.j2

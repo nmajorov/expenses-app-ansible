@@ -16,10 +16,6 @@ spec:
     # full external url of backend app
     - name: BACKEND_URL
 
-  resources:
-    - name: ui-image
-      type: image
-
 
   workspaces:
     - name: ui-workspace
