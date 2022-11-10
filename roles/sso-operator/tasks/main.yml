@@ -74,7 +74,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ sso_operator_namespace }}"
-    definition: "{{ lookup('file','{{custom_route }}') | from_yaml }}"
+    definition: "{{ lookup('file','{{custom_sso_route }}') | from_yaml }}"
   when: tls_route is defined
   tags:
     - sso
