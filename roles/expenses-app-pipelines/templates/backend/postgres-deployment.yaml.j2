@@ -21,6 +21,7 @@ metadata:
   name: {{database_deployment_name}}
   labels:
     app: {{database_deployment_name}}
+    app.openshift.io/runtime: postgresql
 spec:
   replicas: 1
   selector:
