@@ -68,13 +68,26 @@
 
   tags:
     - sso 
+
+- name: "sso: set fact for custom route"
+  ansible.builtin.set_fact:
+    route_service_name: keycloak
+    route_app_name: keycloak
+    route_name: keycloak
+    route_service_target_port: keycloak
+    route_termination_type: reencrypt
+  when: tls_route is defined
+  tags:
+    - sso
+
 # oc delete routes keycloak
 - name: "sso: create a https route"
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
     namespace: "{{ sso_operator_namespace }}"
-    definition: "{{ lookup('file','{{custom_sso_route }}') | from_yaml }}"
+    template: "{{ custom_route }}"
+    # definition: "{{ lookup('file','{{ custom_route }}') | from_yaml }}"
   when: tls_route is defined
   tags:
     - sso

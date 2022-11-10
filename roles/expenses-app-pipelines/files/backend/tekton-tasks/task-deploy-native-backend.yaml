@@ -53,6 +53,7 @@ spec:
                                                -e KEYCLOAK_INTROSPECT_URL="$KEYCLOAK_URL/protocol/openid-connect/token/introspect" \
                                                -e KEYCLOAK_CLIENT_ID="backend" \
                                                -e KEYCLOAK_SECRET="16c3384b-725d-410d-8107-df3319165f70"
-          echo "expose service"
+          echo "label service service"
           echo
-          oc expose svc/expenses-backend-quarkus
+          oc label deployment/expenses-backend-quarkus  app.openshift.io/runtime=quarkus --overwrite
+         
