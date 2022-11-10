@@ -4,13 +4,13 @@ metadata:
   name: test-nodejs-app
 spec:
   params:
-    - name: VERSION
+    - name: BUILD_IMAGE
       description: The version of the nodejs
-      default: '10'
+      default: "registry.redhat.io/rhscl/nodejs-14-rhel7:1-91"
       type: string
   steps:
       - name: test-app
-        image: 'registry.access.redhat.com/rhscl/nodejs-$(inputs.params.VERSION)-rhel7'
+        image: "$(inputs.params.BUILD_IMAGE)"
         workingDir: /workspace/input-ui-source
         command: ["/bin/bash", "-c"]
         args:
@@ -24,10 +24,8 @@ spec:
             npm install -g yarn
             yarn --version
             echo "install dependencies"
-            yarn install
+            yarn
 
-            echo "add react-scripts"
-            yarn add react-scripts
 
             echo "run tests"
             yarn test

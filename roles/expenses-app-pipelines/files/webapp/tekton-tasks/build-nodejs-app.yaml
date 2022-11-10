@@ -4,9 +4,9 @@ metadata:
   name: build-nodejs-app
 spec:
   params:
-    - name: VERSION
-      description: The version of the nodejs build image
-      default: '10'
+    - name: BUILD_IMAGE
+      description: The container image of the nodejs
+      default: "registry.redhat.io/rhscl/nodejs-14-rhel7:1-91"
       type: string
 
     - name: sso-url
@@ -31,7 +31,7 @@ spec:
 
   steps:
     - name: yarn-build-app
-      image: 'registry.access.redhat.com/rhscl/nodejs-$(params.VERSION)-rhel7'
+      image: '$(params.BUILD_IMAGE)'
       workingDir: /workspace/input-ui-source
       command: ["/bin/bash", "-c"]
 

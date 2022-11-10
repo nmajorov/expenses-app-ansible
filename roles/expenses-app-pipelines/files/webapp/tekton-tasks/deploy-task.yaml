@@ -5,7 +5,7 @@ metadata:
 spec:
   params:
     - name: VERSION
-      description: The version of the nodejs web ui  build image to deploy
+      description: The version of the nodejs web ui  build image
       default: 'latest'
       type: string
 
@@ -23,15 +23,14 @@ spec:
           if [[ $? -ne 0 ]]
               then
           	    oc new-app --name=nodejs-gui --image-stream=gui:latest
-                oc expose svc nodejs-gui
 
               else
                 echo "Application already exists."
           	    oc delete all --selector=app=nodejs-gui
                 oc new-app --name=nodejs-gui --image-stream=gui:latest
-                oc expose svc nodejs-gui
+                #  oc expose svc nodejs-gui
           fi
-          
+
           echo "add nice nodejs icon on top"
 
           oc label deployment/nodejs-gui  app.kubernetes.io/name=nodejs --overwrite

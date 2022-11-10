@@ -12,9 +12,9 @@ spec:
     - name: GIT_REVISION
       value: "{{ app_frontend_git_revision }}"
     - name: SSO_URL
-      value: 'https://{{ ssohost.stdout }}'
+      value: '{{ sso_host }}'
     - name: BACKEND_URL
-      value: 'http://expenses-backend-quarkus-nm-demo.apps.p30775tl.westeurope.aroapp.io'
+      value: '{{ backend_url }}'
   workspaces:
     - name: ui-workspace
       persistentVolumeClaim:
