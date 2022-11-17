@@ -8,6 +8,9 @@
 
 
 
+# TODO clean database by dropping all tables or eventually redeploy it
+#  oc delete all --selector app=knm
+#  oc delete pvc --selector app=knm
 
 - name: "deploy backend workspace pvc"
   kubernetes.core.k8s:
@@ -27,7 +30,7 @@
 
 
 
-- name: "backend: delete tekton-task if exists"
+- name: "backend: delete tekton-task and previous deployment if exists"
   # to redeploy we need to delete tekton-task first
   ansible.builtin.shell: |
     {{ openshift_cli }} delete tasks.tekton.dev  backend-mvn  \
@@ -38,6 +41,11 @@
 
     {{ openshift_cli }} delete pipelines.tekton.dev build-and-deploy-backend \
       --ignore-not-found=true -n {{ app_namespace}}
+
+    echo "clean up previous deployments inclusive route"
+    {{ openshift_cli }} delete all --selector app=expenses-backend-quarkus \
+       --ignore-not-found -n {{ app_namespace}}
+
      exit 0
   changed_when: false
 
@@ -64,14 +72,23 @@
     src:
       backend/pipeline.yaml
 
+# for keycloak >=  18 url is without /auth
+- name: "backend: set sso host for sso 7.6 with tls"
+  ansible.builtin.set_fact:
+    sso_host: "https://{{ ssohost.stdout }}"
+  when: tls_route is defined
 
+- name: "backeend: set sso host for sso 7.6"
+  ansible.builtin.set_fact:
+    sso_host: "http://{{ ssohost.stdout }}"
+  when: tls_route is not defined
 
 - name: "backend: show backend build variables"
   ansible.builtin.debug:
     msg:
       - "run pipeline with params"
-      - " branch: {{ app_backend_git_revision }} "
-      - " sso url: https://{{ ssohost.stdout }} "
+      - " branch: {{ app_backend_git_revision }}"
+      - " sso url: https://{{ ssohost.stdout }}"
 
 
 - name: "backend: create a pipline run backend "
@@ -81,3 +98,31 @@
     namespace: "{{ app_namespace }}"
     template:
       backend/pipeline-run.yaml.j2
+
+- name: "backend: set fact for custom route"
+  ansible.builtin.set_fact:
+    route_service_name: expenses-backend-quarkus
+    route_app_name: expenses-backend-quarkus
+    route_name: expenses-backend-quarkus
+    route_service_target_port: 8080-tcp
+    route_termination_type: edge
+  when: tls_route is defined
+
+
+
+# oc delete routes web app
+- name: "backend: create a https route"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template: "{{ custom_route }}"
+    # definition: "{{ lookup('file','{{ custom_route }}') | from_yaml }}"
+  when: tls_route is defined
+
+
+- name: "backend: create http route"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} expose svc expenses-backend-quarkus -n {{ app_namespace }}
+    exit 0
+  when: tls_route is not defined
