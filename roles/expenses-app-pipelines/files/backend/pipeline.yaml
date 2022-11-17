@@ -24,9 +24,6 @@ spec:
     - name: database-service-name
       type: string
       default: "knm"
-  resources:
-    - name: backend-image
-      type: image
   tasks:
     - name: clean-workspace
       taskRef:

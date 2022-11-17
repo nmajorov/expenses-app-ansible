@@ -1,0 +1,24 @@
+# run pipeline on master branch
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: "expenses-weeb-run-rd{{ 1000 | random }}"
+spec:
+  pipelineRef:
+    name: build-expenses-web-ui
+  params:
+    - name: GIT_URL
+      value: 'https://github.com/nmajorov/expenses-web-ui.git'
+    - name: GIT_REVISION
+      value: "{{ app_frontend_git_revision }}"
+    - name: SSO_URL
+      value: '{{ sso_host }}'
+    - name: BACKEND_URL
+      value: '{{ backend_url }}'
+  workspaces:
+    - name: ui-workspace
+      persistentVolumeClaim:
+        claimName: ui-source-pvc
+ # taskRunSpecs:
+ #   - pipelineTaskName: webapp-build-runtime
+ #     taskServiceAccountName: builder

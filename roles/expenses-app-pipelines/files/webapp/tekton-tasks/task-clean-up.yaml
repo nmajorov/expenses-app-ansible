@@ -1,0 +1,39 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: clean-up
+
+spec:
+  params:
+    - name: keep-repo
+      type: string
+      description: "keep maven repo for next builds to speed up development"
+      default: "false"
+
+  steps:
+    - name: clean
+      image: quay.io/openshift/origin-cli:latest
+      workingDir: /workspace/input-ui-source
+      script: |
+        #!/usr/bin/env bash
+        set -x
+
+        pwd
+
+        if [ "$(params.keep-repo)" == "true" ] ; then
+            echo "remove existing checkout sources but keep repo"
+
+            find .  -not -path "./mvnrepo*"  -exec rm -rf {}  \;
+
+        else
+             find . -exec rm -rf  {} 2>  \;
+        fi
+
+
+        ls -lisa
+        df -h
+
+  workspaces:
+    - name: input
+      mountPath: /workspace/input-ui-source

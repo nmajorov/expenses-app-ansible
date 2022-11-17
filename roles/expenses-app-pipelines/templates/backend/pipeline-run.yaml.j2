@@ -8,7 +8,7 @@ spec:
     - name: git-revision
       value: "{{ app_backend_git_revision }}"
     - name: keycloak_url
-      value: "https://{{ ssohost.stdout }}"
+      value: "{{ sso_host }}"
      # backend database parameters
     - name: postgesql-user
       value: "{{ postgresql_user }}"
@@ -25,7 +25,3 @@ spec:
   - name: shared-workspace
     persistentVolumeClaim:
       claimName: source-pvc
-  resources:
-    - name: backend-image
-      resourceRef:
-        name: backend-image

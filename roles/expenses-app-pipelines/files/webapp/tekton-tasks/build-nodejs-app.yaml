@@ -1,0 +1,77 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-nodejs-app
+spec:
+  params:
+    - name: BUILD_IMAGE
+      description: The container image of the nodejs
+      default: "registry.redhat.io/rhscl/nodejs-14-rhel7:1-91"
+      type: string
+
+    - name: sso-url
+      description: "url to keycloak realm"
+      type: string
+      default: http://sso-test:8080/auth/
+
+    - name: sso-realm
+      description: "keycloak realm name"
+      type: string
+      default: basic
+
+
+    - name: sso-client-id
+      description: "keycloak client id"
+      type: string
+      default: app-react
+
+    - name: backend-url
+      description: "route addr of backend app as full url"
+      type: string
+
+  steps:
+    - name: yarn-build-app
+      image: '$(params.BUILD_IMAGE)'
+      workingDir: /workspace/input-ui-source
+      command: ["/bin/bash", "-c"]
+
+      args:
+        - |-
+          echo "current git branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "install yarn"
+          npm install -g yarn
+          echo "yarn version: $(yarn --version)"
+
+          # echo define env for production
+          export REACT_APP_KEYCLOAK_URL="$(params.sso-url)"
+          export REACT_APP_KEYCLOAK_REALM="$(params.sso-realm)"
+          export REACT_APP_KEYCLOAK_CLIENT_ID="$(params.sso-client-id)"
+          export REACT_APP_BACKEND_URL="$(params.backend-url)"
+
+          echo "replace .env.production file with parameters from task"
+
+          sed -ri  "s|REACT_APP_KEYCLOAK_URL=.*|REACT_APP_KEYCLOAK_URL=$REACT_APP_KEYCLOAK_URL|g" .env.production
+          sed -ri  "s|REACT_APP_KEYCLOAK_REALM=.*|REACT_APP_KEYCLOAK_URL=$REACT_APP_KEYCLOAK_REALM|g" .env.production
+          sed -ri  "s|REACT_APP_KEYCLOAK_CLIENT_ID=.*|REACT_APP_KEYCLOAK_CLIENT_ID=$REACT_APP_KEYCLOAK_CLIENT_ID|g" .env.production
+          sed -ri  "s|REACT_APP_BACKEND_URL=.*|REACT_APP_BACKEND_URL=$REACT_APP_BACKEND_URL|g" .env.production
+          echo
+          echo "read react environment"
+          cat .env.production
+
+          echo
+          echo "node version"
+          node --version
+          echo "start build for prod works with node < 17"
+
+          yarn build-old
+
+          echo
+          echo
+          echo "copy web server config in build directory"
+          cp -vr ./nginx.conf   ./build
+
+
+
+  workspaces:
+   - name: input
+     mountPath: /workspace/input-ui-source

@@ -33,11 +33,12 @@
 
 
 
-- name: check wildcard domain for tls_route
+- name: "sso: check wildcard domain for tls_route"
   ansible.builtin.debug:
-    msg: 
+    msg:
       - "wildcard domain is set {{ wildcard_domain is defined }} "
       - "tls_route is defined: {{ tls_route is defined }}"
+  #    - " route cert: {{ tls }}"
   failed_when:
     - wildcard_domain is not defined
     - tls_route is defined
@@ -45,6 +46,57 @@
     - sso
 
 
+- name: "sso: check if operator already installed"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pods -l name=rhsso-operator   -n {{ sso_operator_namespace }} --ignore-not-found \
+    | wc -l
+    exit 0
+  register: ssopodsrunning
+  tags:
+    - sso
+
+
 - import_tasks: sso-operator.yaml
+  when: "'0' in ssopodsrunning.stdout"
+  tags:
+    - sso
+
+- name: "sso: Remove an existing route object"
+  ansible.builtin.shell:
+    cmd: |
+      {{openshift_cli }} delete --ignore-not-found route keycloak -n {{ sso_operator_namespace  }}
+
+  tags:
+    - sso 
+
+- name: "sso: set fact for custom route"
+  ansible.builtin.set_fact:
+    route_service_name: keycloak
+    route_app_name: keycloak
+    route_name: keycloak
+    route_service_target_port: keycloak
+    route_termination_type: reencrypt
+  when: tls_route is defined
+  tags:
+    - sso
+
+# oc delete routes keycloak
+- name: "sso: create a https route"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    template: "{{ custom_route }}"
+    # definition: "{{ lookup('file','{{ custom_route }}') | from_yaml }}"
+  when: tls_route is defined
+  tags:
+    - sso
+
+# if cluster has a valid certificate
+- name: "sso: create route if cluster has valid cert"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} create route reencrypt --service keycloak --port 8443  -n {{ sso_operator_namespace }}
+    exit 0
+  when: tls_route is not defined
   tags:
     - sso

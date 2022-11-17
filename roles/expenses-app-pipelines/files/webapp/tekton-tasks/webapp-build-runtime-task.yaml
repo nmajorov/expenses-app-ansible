@@ -1,0 +1,47 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: webapp-build-runtime
+spec:
+ # inputs:
+ #   resources:
+ #   - name: image
+ #     type: image
+  params:
+    - name: WEB_RUNTIME_IMAGE
+      description: The Web Runtime image to use,  defaults to registry.redhat.io/rhscl/nginx-116-rhel7:1.16
+      # default: registry.redhat.io/rhscl/nginx-116-rhel7:1.16 # need a docker secret in project
+      # use OpenShift internal
+      default: quay.io/sclorg/nginx-118-c8s:c8s
+    - name: TLSVERIFY
+      description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
+      default: "false"
+    - name: STORAGE_DRIVER
+      description: Set buildah storage driver
+      type: string
+      default: "vfs"
+
+
+  steps:
+  - name: dockerfile
+    image: quay.io/openshift-pipeline/s2i:v0.8.0
+    workingdir: /workspace/source
+    script: |
+      #!/usr/bin/env bash
+      echo "current dir : $(pwd)"
+      echo "list directory:"
+      echo
+      ls -lisa
+      echo
+      echo "current user: $(id -a)"
+    
+    
+
+      s2i build $(pwd)/build $(inputs.params.WEB_RUNTIME_IMAGE) --as-dockerfile Dockerfile.gen
+   
+
+  workspaces:
+  - name: input
+    mountPath: /workspace/source
+

@@ -1,0 +1,131 @@
+---
+- name: "webapp: deploy webapp message"
+  ansible.builtin.debug:
+    msg:
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+      - "deploy webapp pipeline in namespace '{{ app_namespace }}'"
+      - "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+
+- name: "webapp: delete tekton-task if exists"
+  # to redeploy we need to delete tekton-task first
+  ansible.builtin.shell: |
+    {{ openshift_cli }} delete tasks.tekton.dev  build-nodejs-app  \
+     --ignore-not-found=true -n {{ app_namespace}}
+     exit 0
+  changed_when: false
+
+
+
+
+- name: "webapp: remove previous tekton-task"
+  kubernetes.core.k8s:
+    state: absent
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+    - webapp/tekton-tasks/build-nodejs-app.yaml
+    - webapp/tekton-tasks/deploy-task.yaml
+    - webapp/tekton-tasks/task-clean-up.yaml
+    - webapp/tekton-tasks/test-nodejs-app-task.yaml
+    - webapp/tekton-tasks/webapp-build-runtime-task.yaml
+    - webapp/pipeline.yaml
+
+
+- name: "webapp: deploy tekton-task"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    src: "{{ item }}"
+  loop:
+    - webapp/tekton-resources/pvc-workspace.yaml
+    - webapp/tekton-tasks/build-nodejs-app.yaml
+    - webapp/tekton-tasks/deploy-task.yaml
+    - webapp/tekton-tasks/task-clean-up.yaml
+    - webapp/tekton-tasks/test-nodejs-app-task.yaml
+    - webapp/tekton-tasks/webapp-build-runtime-task.yaml
+    - webapp/pipeline.yaml
+
+
+
+
+- name: "webapp: get full backend url from route"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get route -n {{ app_namespace }} \
+    expenses-backend-quarkus -o jsonpath=\{.spec.host\}
+    exit 0
+  register: backendhost
+  tags:
+    - web
+
+
+
+# for keycloak >=  18 url is without /auth
+- name: "webapp: set sso host for sso 7.6 with tls"
+  ansible.builtin.set_fact:
+    sso_host: "https://{{ ssohost.stdout }}/auth/"
+    backend_url: "https://{{ backendhost.stdout }}"
+  when: tls_route is defined
+  tags:
+    - web
+
+- name: "webapp: set sso host for sso 7.6"
+  ansible.builtin.set_fact:
+    sso_host: "http://{{ ssohost.stdout }}/auth/"
+    backend_url: "http://{{ backendhost.stdout }}"
+  when: tls_route is not defined
+  tags:
+    - web
+
+
+
+- name: "webapp: show build variables"
+  ansible.builtin.debug:
+    msg:
+      - "run pipeline with params"
+      - " branch: {{ app_backend_git_revision }} "
+      - " sso url: {{ sso_host }}"
+      - " backend url: {{ backend_url }} "
+
+- name: "webapp: run a  pipeline"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template:
+      webapp/pipelinerun.yaml.j2
+
+
+- name: "webapp: set fact for custom route"
+  ansible.builtin.set_fact:
+    route_service_name: nodejs-gui
+    route_app_name: nodejs-webapp
+    route_name: nodejs-gui
+    route_service_target_port: 8080-tcp
+    route_termination_type: edge
+  when: tls_route is defined
+  tags:
+    - web
+
+
+# oc delete routes web app
+- name: "webapp: create a https route"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ app_namespace }}"
+    template: "{{ custom_route }}"
+    # definition: "{{ lookup('file','{{ custom_route }}') | from_yaml }}"
+  when: tls_route is defined
+  tags:
+    - web
+
+
+- name: "webapp: create http route"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} expose svc nodejs-gui -n {{ app_namespace }}
+    exit 0
+  when: tls_route is not defined
+  tags:
+    - web
