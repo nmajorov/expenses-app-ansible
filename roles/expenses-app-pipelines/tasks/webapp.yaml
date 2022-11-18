@@ -86,7 +86,8 @@
       - "run pipeline with params"
       - " branch: {{ app_backend_git_revision }} "
       - " sso url: {{ sso_host }}"
-      - " backend url: {{ backend_url }} "
+      - " backend url: {{ backend_url }}"
+      - " sso-client-id: {{ sso_client_id }}"
 
 - name: "webapp: run a  pipeline"
   kubernetes.core.k8s:

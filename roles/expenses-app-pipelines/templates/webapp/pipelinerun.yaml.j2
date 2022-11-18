@@ -15,6 +15,9 @@ spec:
       value: '{{ sso_host }}'
     - name: BACKEND_URL
       value: '{{ backend_url }}'
+    - name: SSO_CLIENT_ID
+      value: "{{sso_client_id}}"
+
   workspaces:
     - name: ui-workspace
       persistentVolumeClaim:

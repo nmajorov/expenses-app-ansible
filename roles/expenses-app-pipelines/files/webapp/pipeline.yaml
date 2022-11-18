@@ -16,6 +16,9 @@ spec:
     # full external url of backend app
     - name: BACKEND_URL
 
+    - name: SSO_CLIENT_ID
+      default: "app-react"
+
 
   workspaces:
     - name: ui-workspace
@@ -55,7 +58,7 @@ spec:
         - name: input
           workspace: ui-workspace
 
-  
+
     - name: build-nodejs-app
       taskRef:
         name: build-nodejs-app
@@ -64,6 +67,8 @@ spec:
           value: $(params.SSO_URL)
         - name: backend-url
           value: $(params.BACKEND_URL)
+        - name: sso-client-id
+          value: $(params.SSO_CLIENT_ID)
       runAfter:
         - test
       workspaces:
@@ -82,8 +87,8 @@ spec:
     - name: "docker-build-push"
       taskRef:
         name: "buildah"
-      runAfter: 
-        - "create-docker-file"  
+      runAfter:
+        - "create-docker-file"
       params:
         - name: IMAGE
           value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/gui:latest
@@ -92,11 +97,11 @@ spec:
         - name: DOCKERFILE
           value: Dockerfile.gen
         - name: SKIP_PUSH
-          value: false    
+          value: false
       workspaces:
         - name: source
           workspace: ui-workspace
-           
+
     - name: deploy-nodejs-app
       taskRef:
         name: deploy-nodejs-app
