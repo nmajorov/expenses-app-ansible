@@ -1,33 +1,30 @@
 ---
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: push-image
 spec:
-  inputs:
-   # resources:
-    #  - name: source
-    #    type: git
-    params:
-      - name: VERSION
-        description: The version of the build image
-        default: '20.1.0-java11'
-        type: string
-      - name: PATH_CONTEXT
-        description: The location of the path to run s2i from.
-        default: .
-        type: string
-      - name: TLSVERIFY
-        description: Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)
-        default: "false"
-        type: string
-      - name: STORAGE_DRIVER
-        description: Set buildah storage driver
-        type: string
-        default: vfs
+  params:
+    - name: VERSION
+      description: "The version of the build image"
+      default: '20.1.0-java11'
+      type: string
+    - name: PATH_CONTEXT
+      description: "The location of the path to run s2i from."
+      default: .
+      type: string
+    - name: TLSVERIFY
+      description: "Verify the TLS on the registry endpoint (for push/pull to a non-TLS registry)"
+      default: "false"
+      type: string
+    - name: STORAGE_DRIVER
+      description: Set buildah storage driver
+      type: string
+      default: vfs
 
-  outputs:
-    resources:
+  
+  resources:
+    outputs:
       - name: image
         type: image
   steps:

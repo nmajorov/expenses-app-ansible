@@ -2,37 +2,35 @@
 # old --- not used solution ... just keep as example
 # deploy SSO and postgresql database
 # expenses app server and client using SSO for users authorisation/authentications
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: deploy-postgresql
 spec:
-  inputs:
-    params:
+  params:
+    - name: postgesql-user
+      type: string
+      description: login for postgresql database
+      default: keycloak
 
-      - name: postgesql-user
-        type: string
-        description: login for postgresql database
-        default: keycloak
+    - name: postgresql-password
+      type: string
+      description: password for postgresql database
+      default: keycloak
 
-      - name: postgresql-password
-        type: string
-        description: password for postgresql database
-        default: keycloak
+    - name: postresql-database
+      type: string
+      default: root
+      description: default database
 
-      - name: postresql-database
-        type: string
-        default: root
-        description: default database
+    - name: app-name
+      type: string
+      default: expense-database
 
-      - name: app-name
-        type: string
-        default: expense-database
-
-      - name: deleteExisting
-        description: clean existing deployment
-        type: string
-        default: "true"
+    - name: deleteExisting
+      description: clean existing deployment
+      type: string
+      default: "true"
 
   steps:
     - name: deploy-database
@@ -42,7 +40,7 @@ spec:
           value: $(inputs.params.deleteExisting)
       script: |
           #!/usr/bin/env bash
-          #oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default
+          # oc policy add-role-to-user view system:serviceaccount:$(oc project -q):default
           echo "create database"
 
           clean(){
