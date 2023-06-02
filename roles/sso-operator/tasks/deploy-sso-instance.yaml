@@ -1,0 +1,112 @@
+################################################
+# create keycloak instance                     #
+# with basic realm for the expense-app demo    #
+#################################################
+---
+
+
+- name: Create Namespace for sso
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      kind: Namespace
+      apiVersion: v1
+      metadata:
+        name: "{{ sso_operator_namespace }}"
+  tags:
+    - sso
+
+
+
+- name: "create keycloak instance"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    definition:
+      apiVersion: keycloak.org/v1alpha1
+      kind: Keycloak
+      metadata:
+        labels:
+          app: sso
+        name: nm-keycloak
+      spec:
+        instances: 1
+
+
+- name: "Wait for db to start"
+  ansible.builtin.shell: |
+    {{ openshift_cli }} get pods   -n {{ sso_operator_namespace }} \
+    --selector app=keycloak,component=database \
+    -o jsonpath='{.items[*].status.containerStatuses[*].ready}' \
+    | grep 'true' | wc -l
+    exit 0
+  register: podsrunning
+  until: " '1' in podsrunning.stdout"
+  retries: 120
+  delay: 2
+  changed_when: false
+  tags:
+    - sso
+
+- name: "restart sso pod"
+  ansible.builtin.shell: |
+    oc delete  pods \
+    --selector app=keycloak,rht.subcomp=SSO_Server \
+    -n {{ sso_operator_namespace }}
+    exit 0
+  changed_when: false
+  tags:
+    - sso
+
+- name: "check if sso server  pod is running"
+  ansible.builtin.shell: |
+      {{ openshift_cli }} get  pods  -n {{ sso_operator_namespace }} \
+      --selector app=keycloak,rht.subcomp=SSO_Server \
+      -o jsonpath='{.items[*].status.containerStatuses[*].ready}' \
+      | grep 'true' | wc -l
+      exit 0
+  register: podsrunning
+  until: " '1' in podsrunning.stdout"
+  retries: 120
+  delay: 2
+  changed_when: false
+  tags:
+    - sso
+
+
+- name: "create basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      basic-realm.yaml
+  tags:
+    - sso
+
+
+- name: "create users for basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      basic-realm-users.yaml
+  tags:
+    - sso
+
+
+- name: "create backend client for basic realm"
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    namespace: "{{ sso_operator_namespace }}"
+    src:
+      sso-clients.yaml
+  tags:
+    - sso
+
+
+
