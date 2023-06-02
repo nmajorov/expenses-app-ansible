@@ -1,37 +1,36 @@
 ---
 
 # deploy quarkus app backend native image
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: deploy-native-backend
 spec:
-  inputs:
-    params:
-      - name: postgresql-image
-        type: string
-        description: The postgresql image to deploy
-        default: registry.redhat.io/rhel8/postgresql-10
-      - name: postgesql-user
-        type: string
-        description: login for postgresql database
-        default: keycloak
-      - name: postgresql-password
-        type: string
-        description: password for postgresql database
-        default: keycloak
-      - name: postresql-database
-        type: string
-        default: root
-        description: default database
+  params:
+    - name: postgresql-image
+      type: string
+      description: The postgresql image to deploy
+      default: registry.redhat.io/rhel8/postgresql-10
+    - name: postgesql-user
+      type: string
+      description: login for postgresql database
+      default: keycloak
+    - name: postgresql-password
+      type: string
+      description: password for postgresql database
+      default: keycloak
+    - name: postresql-database
+      type: string
+      default: root
+      description: default database
 
-      - name: database-service-name
-        type: string
-        default: knm
+    - name: database-service-name
+      type: string
+      default: knm
 
-      - name: keycloak_url
-        type: string
-        default: sso-test:8080
+    - name: keycloak_url
+      type: string
+      default: sso-test:8080
 
 
   steps:
