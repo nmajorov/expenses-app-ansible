@@ -6,3 +6,4 @@ sso_operator_namespace: nm-sso
 postgresql_database: "root"
 postgresql_user: "keycloak"
 postgresql_password: "keycloak"
+sso_operator_version: "rhsso-operator.7.6.3-opr-001"
