@@ -10,6 +10,6 @@
   vars_files:
       - vars/vars.yaml
   roles:
-    - {role: openshift-pipeline-operator}
-    - {role: sso-operator}
-    - {role: expenses-app-pipelines}
+      - {role: openshift-pipeline-operator}
+      - {role: sso-operator}
+      - {role: expenses-app-pipelines}
