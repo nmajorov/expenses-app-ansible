@@ -1,13 +1,10 @@
 ---
 #  tasks for openshift4
 
-- debug: 
+- debug:
     msg: "Configure OpenShift pipeline operator"
   tags:
     - tekton
-
-
-
 
 - name: "Set KUBECONFIG contents if not defined"
   set_fact:
@@ -18,10 +15,9 @@
 
 
 - debug:
-      var=kubeconfig
+    var=kubeconfig
   tags:
     - tekton
-
 
 
 - name: Gather installed openshift_cli  version, if there is any
@@ -36,17 +32,14 @@
     - tekton
 
 
-
 - debug:
-      msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
+    msg: " {{openshift_cli }} version: {{ ocresult.stdout }}"
   tags:
     - tekton
 
 
-
-
 - debug:
-      msg: " pipeline operator install in namespace: {{ pipeline_operator_namespace }}"
+    msg: " pipeline operator install in namespace: {{ pipeline_operator_namespace }}"
   tags:
     - tekton
 
@@ -65,4 +58,3 @@
   when: "'0' in pipelinepodsrunning.stdout"
   tags:
     - tekton
-

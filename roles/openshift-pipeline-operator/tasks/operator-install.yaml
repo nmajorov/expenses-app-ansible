@@ -32,7 +32,7 @@
 - name: "Wait for operator to start"
   ansible.builtin.shell: |
     {{ openshift_cli }} get pods -l name=openshift-pipelines-operator  -n {{ pipeline_operator_namespace }} \
-    |  awk '{print $3}' \ 
+    |  awk '{print $3}' \
     | grep 'Pending|CrashLoopBackOff|ImagePullBackOff|ContainerCreating' | wc -l
     exit 0
   register: podsrunning

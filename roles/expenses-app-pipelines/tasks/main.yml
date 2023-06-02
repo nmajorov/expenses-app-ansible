@@ -13,8 +13,7 @@
 
 
 - debug:
-      var=kubeconfig
-
+    var=kubeconfig
 
 
 - name: Gather installed openshift_cli  version, if there is any
